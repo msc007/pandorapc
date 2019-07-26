@@ -4,26 +4,26 @@ const app = express();
 const axios = require("axios");
 const cheerio = require("cheerio");
 const mongoose = require("mongoose");
-const Item = require("./models/item");
+const Item = require("./models/Item");
 const db = require("./config/keys").MongoURI;
 
-//Connect to Mongo
+// Connect to MongoDB
 mongoose
   .connect(db, { useNewUrlParser: true })
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.log("Failed to connect: ", err));
 
-//Get a product price from Amazon
+// Get a product price from Amazon
 async function main() {
   const userAgent =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36";
 
-  // Query product links
+  // Query products from DB
   await Item.find({})
     .exec()
     .then(items => {
       items.forEach(item => {
-        URL = item.URL;
+        itemModel = item;
       });
       mongoose.connection.close();
     })
@@ -32,18 +32,19 @@ async function main() {
       throw err;
     });
 
-  // GET request to product link
-  const response = await axios.get(URL, {
-    headers: {
-      "User-Agent": userAgent
-    }
+  // GET request to product page for all vendors
+  itemModel.vendors.forEach(async vendor => {
+    const response = await axios.get(vendor.url, {
+      headers: {
+        "User-Agent": userAgent
+      }
+    });
+    // Scrap price element from the response
+    const rawHTML = response.data;
+    const $ = cheerio.load(rawHTML);
+    const priceElement = $("#priceblock_ourprice").text();
+    console.log(priceElement);
   });
-
-  // Scrap price element from the response
-  const rawHTML = response.data;
-  const $ = cheerio.load(rawHTML);
-  const priceElement = $("#priceblock_ourprice").text();
-  console.log(priceElement);
 }
 
 main().catch(console.error);
