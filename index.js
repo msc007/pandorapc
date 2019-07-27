@@ -7,6 +7,9 @@ const mongoose = require("mongoose");
 const Item = require("./models/Item");
 const db = require("./config/keys").MongoURI;
 
+// Set static public directory (for css/jquery/etc...)
+app.use(express.static(__dirname + "/public"));
+
 // Connect to MongoDB
 mongoose
   .connect(db, { useNewUrlParser: true })
@@ -47,15 +50,29 @@ async function main() {
     const priceElement = $("#priceblock_ourprice").text();
     console.log(priceElement);
   }
-
-  console.log("after foreach");
 }
 
 main().catch(console.error);
 
-// Routes
+// Index Route
 app.get("/", (req, res) => {
-  res.render("index.ejs");
+  // TODO: Need to handle multiple items
+  Item.find({})
+    .exec()
+    .then(items => {
+      items.forEach(item => {
+        itemModel = item;
+      });
+      mongoose.connection.close();
+    })
+    .catch(err => {
+      mongoose.connection.close();
+      throw err;
+    });
+
+  res.render("index.ejs", {
+    itemModel: itemModel
+  });
 });
 
 // Start the server
