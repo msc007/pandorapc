@@ -32,8 +32,10 @@ async function main() {
       throw err;
     });
 
+  //TODO: forEach is not async itselft might need to use "for(let vendor of itemModel.vendors)" or Promise.all()
   // GET request to product page for all vendors
-  itemModel.vendors.forEach(async vendor => {
+  //await itemModel.vendors.forEach(async vendor => {
+  for (vendor of itemModel.vendors) {
     const response = await axios.get(vendor.url, {
       headers: {
         "User-Agent": userAgent
@@ -44,14 +46,16 @@ async function main() {
     const $ = cheerio.load(rawHTML);
     const priceElement = $("#priceblock_ourprice").text();
     console.log(priceElement);
-  });
+  }
+
+  console.log("after foreach");
 }
 
 main().catch(console.error);
 
 // Routes
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.render("index.ejs");
 });
 
 // Start the server
