@@ -32,16 +32,16 @@ async function main() {
       throw err;
     });
 
-  //TODO: forEach is not async itselft might need to use "for(let vendor of itemModel.vendors)" or Promise.all()
+  // TODO: forEach is not async itselft might need to use "for(let vendor of itemModel.vendors)" or Promise.all()
   // GET request to product page for all vendors
-  //await itemModel.vendors.forEach(async vendor => {
+  // await itemModel.vendors.forEach(async vendor => {
   for (vendor of itemModel.vendors) {
     const response = await axios.get(vendor.url, {
       headers: {
         "User-Agent": userAgent
       }
     });
-    // Scrap price element from the response
+    // Scrape price element from the response
     const rawHTML = response.data;
     const $ = cheerio.load(rawHTML);
     const priceElement = $("#priceblock_ourprice").text();
@@ -60,4 +60,4 @@ app.get("/", (req, res) => {
 
 // Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server started on poart ${PORT}`));
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
