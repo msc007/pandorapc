@@ -23,15 +23,12 @@ async function main() {
 
   // Query products from DB
   await Item.find({})
-    .exec()
     .then(items => {
       items.forEach(item => {
         itemModel = item;
       });
-      mongoose.connection.close();
     })
     .catch(err => {
-      mongoose.connection.close();
       throw err;
     });
 
@@ -58,21 +55,15 @@ main().catch(console.error);
 app.get("/", (req, res) => {
   // TODO: Need to handle multiple items
   Item.find({})
-    .exec()
     .then(items => {
-      items.forEach(item => {
-        itemModel = item;
+      //console.log(items);
+      res.render("index.ejs", {
+        items: items
       });
-      mongoose.connection.close();
     })
     .catch(err => {
-      mongoose.connection.close();
       throw err;
     });
-
-  res.render("index.ejs", {
-    itemModel: itemModel
-  });
 });
 
 // Start the server
