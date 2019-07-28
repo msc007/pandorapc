@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 const Item = require("./models/Item");
 const db = require("./config/keys").MongoURI;
 // node cron for scedules execution
-var cron = require('node-cron');
+var cron = require("node-cron");
 
 // Set static public directory (for css/jquery/etc...)
 app.use(express.static(__dirname + "/public"));
@@ -53,9 +53,18 @@ async function main() {
 
 // main().catch(console.error);
 
-cron.schedule('10 0-24 * * *', () => {
+/* NOTE ABOUT CRON:
+ * Second(0-59)
+ * Minute(0-59)
+ * Hour(0-23)
+ * Day(1-31)
+ * Month(1-12)
+ * Day of Week(0-7) 0 and 7 is sunday
+ *
+ */
+cron.schedule("0 0 */1 * * *", () => {
   main().catch(console.error);
-  console.log('Scheduled task running every hour.');
+  console.log("Scheduled task running every hour at 0 second and 0 minute.");
 });
 
 // Index Route
