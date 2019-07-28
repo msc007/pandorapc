@@ -6,6 +6,8 @@ const cheerio = require("cheerio");
 const mongoose = require("mongoose");
 const Item = require("./models/Item");
 const db = require("./config/keys").MongoURI;
+// node cron for scedules execution
+var cron = require('node-cron');
 
 // Set static public directory (for css/jquery/etc...)
 app.use(express.static(__dirname + "/public"));
@@ -49,7 +51,12 @@ async function main() {
   }
 }
 
-main().catch(console.error);
+// main().catch(console.error);
+
+cron.schedule('10 0-24 * * *', () => {
+  main().catch(console.error);
+  console.log('Scheduled task running every hour.');
+});
 
 // Index Route
 app.get("/", (req, res) => {
