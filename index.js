@@ -54,6 +54,8 @@ async function main() {
   }
 }
 
+// main().catch(console.error);
+
 cron.schedule('10 0-24 * * *', () => {
   main().catch(console.error);
   console.log('Scheduled task running every hour.');
