@@ -19,39 +19,37 @@ mongoose
   .catch(err => console.log("Failed to connect: ", err));
 
 // Get a product price from Amazon
-async function main() {
+function main() {
   const userAgent =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36";
 
   // Query products from DB
-  await Item.find({})
-    .then(items => {
-      items.forEach(item => {
-        itemModel = item;
-      });
+  Item.find({})
+    .then(async items => {
+      // TODO: Need another loop for async call for all items. Currently only handle one item (items[0]);
+      // NOTE: forEach is not async use for(of) or promise.all()
+      // GET request to product page for all vendors
+      for (vendor of items[0].vendors) {
+        const response = await axios.get(vendor.url, {
+          headers: {
+            "User-Agent": userAgent
+          }
+        });
+        // TODO: Need to consider things to scrape
+        // Scrape price element from the response
+        const rawHTML = response.data;
+        const $ = cheerio.load(rawHTML);
+        const priceElement = $("#priceblock_ourprice").text();
+        console.log(priceElement);
+
+        //TODO: Need to update DB entry with scraped data
+      }
     })
     .catch(err => {
       throw err;
     });
-
-  // TODO: forEach is not async itselft might need to use "for(let vendor of itemModel.vendors)" or Promise.all()
-  // GET request to product page for all vendors
-  // await itemModel.vendors.forEach(async vendor => {
-  for (vendor of itemModel.vendors) {
-    const response = await axios.get(vendor.url, {
-      headers: {
-        "User-Agent": userAgent
-      }
-    });
-    // Scrape price element from the response
-    const rawHTML = response.data;
-    const $ = cheerio.load(rawHTML);
-    const priceElement = $("#priceblock_ourprice").text();
-    console.log(priceElement);
-  }
 }
-
-// main().catch(console.error);
+main();
 
 /* NOTE ABOUT CRON:
  * Second(0-59)
@@ -60,19 +58,17 @@ async function main() {
  * Day(1-31)
  * Month(1-12)
  * Day of Week(0-7) 0 and 7 is sunday
- *
  */
-cron.schedule("0 0 */1 * * *", () => {
-  main().catch(console.error);
-  console.log("Scheduled task running every hour at 0 second and 0 minute.");
-});
+
+// cron.schedule("0 0 */1 * * *", () => {
+//  main().catch(console.error);
+//  console.log("Scheduled task running every hour at 0 second and 0 minute.");
+//});
 
 // Index Route
 app.get("/", (req, res) => {
-  // TODO: Need to handle multiple items
   Item.find({})
     .then(items => {
-      //console.log(items);
       res.render("index.ejs", {
         items: items
       });
