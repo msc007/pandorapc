@@ -14,7 +14,7 @@
         <% items.forEach( (item) => { item.vendors.forEach( (vendor) => { %>
         <tr>
           <td>
-            <a href="<%= vendor.url %>"><%= item.name %> </a>
+            <a href="<%= vendor.url %>" target="_blank"><%= item.name %> </a>
           </td>
           <td><%= vendor.vendorName %></td>
           <td><%= vendor.currentPrice %></td>
