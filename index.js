@@ -1,13 +1,13 @@
 const express = require("express");
-const path = require("path");
+//const path = require("path");
 const app = express();
 const axios = require("axios");
 const cheerio = require("cheerio");
 const mongoose = require("mongoose");
 const Item = require("./models/Item");
 const db = require("./config/keys").MongoURI;
-// node cron for scedules execution
-var cron = require("node-cron");
+const cron = require("node-cron");
+const email = require("./email");
 
 // Set static public directory (for css/jquery/etc...)
 app.use(express.static(__dirname + "/public"));
@@ -35,14 +35,20 @@ function main() {
             "User-Agent": userAgent
           }
         });
-        // TODO: Need to consider things to scrape
-        // Scrape price element from the response
-        const rawHTML = response.data;
-        const $ = cheerio.load(rawHTML);
-        const priceElement = $("#priceblock_ourprice").text();
-        console.log(priceElement);
 
-        //TODO: Need to update DB entry with scraped data
+        if(response.status === 200) {
+          // TODO: Need to consider things to scrape
+          // Scrape price element from the response
+          const rawHTML = response.data;
+          const $ = cheerio.load(rawHTML);
+          const priceElement = $("#priceblock_ourprice").text();
+          console.log(priceElement);
+
+          // TODO: Need to compare and update DB entry with scraped data
+
+          // TODO Send email if price changed
+          // await email.sendEmail()
+        }
       }
     })
     .catch(err => {
