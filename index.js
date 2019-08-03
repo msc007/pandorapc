@@ -36,7 +36,7 @@ function main() {
           }
         });
 
-        if(response.status === 200) {
+        if (response.status === 200) {
           // TODO: Need to consider things to scrape
           // Scrape price element from the response
           const rawHTML = response.data;
@@ -47,7 +47,7 @@ function main() {
           // TODO: Need to compare and update DB entry with scraped data
 
           // TODO Send email if price changed
-          // await email.sendEmail()
+          await email.sendEmail(vendor.url).catch(console.error);
         }
       }
     })
