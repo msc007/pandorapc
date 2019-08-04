@@ -1,5 +1,5 @@
 const express = require("express");
-//const path = require("path");
+const path = require("path");
 const app = express();
 const axios = require("axios");
 const cheerio = require("cheerio");
@@ -10,7 +10,7 @@ const cron = require("node-cron");
 const email = require("./email");
 
 // Set static public directory (for css/jquery/etc...)
-app.use(express.static(__dirname + "/public"));
+app.use(express.static(path.join(__dirname + "/public")));
 
 // Connect to MongoDB
 mongoose
@@ -38,7 +38,7 @@ function main() {
 
         if (response.status === 200) {
           // TODO: Need to consider things to scrape
-          // Scrape price element from the response
+          // Scrape price element from the responsen
           const rawHTML = response.data;
           const $ = cheerio.load(rawHTML);
           const priceElement = $("#priceblock_ourprice").text();
