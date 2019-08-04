@@ -1,28 +1,28 @@
-const express = require("express");
-//const path = require("path");
+const express = require('express');
+//const path = require('path');
 const app = express();
-const axios = require("axios");
-const cheerio = require("cheerio");
-const mongoose = require("mongoose");
-const Item = require("./models/Item");
-const db = require("./config/keys").MongoURI;
-const cron = require("node-cron");
-const email = require("./email");
+const axios = require('axios');
+const cheerio = require('cheerio');
+const mongoose = require('mongoose');
+const Item = require('./models/Item');
+const db = require('./config/keys').MongoURI;
+const cron = require('node-cron');
+const email = require('./email');
 
 // Set static public directory (for css/jquery/etc...)
-app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + '/public'));
 
 // Connect to MongoDB
 mongoose
   .connect(db, { useNewUrlParser: true })
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log("Failed to connect: ", err));
+  .then(() => console.log('MongoDB Connected'))
+  .catch(err => console.log('Failed to connect: ', err));
 
 // Index Route
-app.get("/", (req, res) => {
+app.get('/', (req, res) => {
   Item.find({})
     .then(items => {
-      res.render("index.ejs", {
+      res.render('index.ejs', {
         items: items
       });
     })
@@ -48,15 +48,15 @@ main();
  * Day of Week(0-7) 0 and 7 is sunday
  */
 
-// cron.schedule("0 0 */1 * * *", () => {
+// cron.schedule('0 0 */1 * * *', () => {
 //  main().catch(console.error);
-//  console.log("Scheduled task running every hour at 0 second and 0 minute.");
+//  console.log('Scheduled task running every hour at 0 second and 0 minute.');
 //});
 
 // Get a product price from Amazon
 function main() {
   const userAgent =
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36";
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36';
 
   // Query products from DB
   Item.find({})
@@ -72,32 +72,31 @@ function main() {
         for (vendor of item.vendors) {
           const response = await axios.get(vendor.url, {
             headers: {
-              "User-Agent": userAgent
+              'User-Agent': userAgent
             }
           });
 
           if (response.status === 200) {
             const rawHTML = response.data;
             const $ = cheerio.load(rawHTML);
-            const priceElement = $("#priceblock_ourprice").text();
-            const productTitle = $("#productTitle").text().trim();
-            const modelNumber = $("#productDetails_techSpec_section_2").wrap();
+            const priceElement = $('#priceblock_ourprice').text();
+            const productTitle = $('#productTitle').text().trim();
+            const modelNumber = $('#productDetails_techSpec_section_2').wrap();
             
             console.log
-              (priceElement ? 
-                '\'' + productTitle + '\': ' + priceElement + ' from ' + vendor.vendorName : 
-                '\'' + productTitle + '\'' + ' price is currently not available' + ' from ' + vendor.vendorName);
+              (priceElement 
+                ? '\'' + productTitle + '\': ' + priceElement + ' from ' + vendor.vendorName 
+                : '\'' + productTitle + '\'' + ' price is currently not available' + ' from ' + vendor.vendorName);
 
             // console.log(debug_f ? productTitle : '');
-
-            // TODO: Need to compare and update DB entry with scraped data
-
-            // Send email if price changed
-            // await email.sendEmail(vendor.url).catch(console.error);
           }
           else {
             console.log('Response error: ' + renponse.status + ' from ' + vendor.vendorName + ' for item ' + item.name);
           }
+          // TODO: Need to compare and update DB entry with scraped data
+
+          // Send email if price changed
+          // await email.sendEmail(vendor.url).catch(console.error);
         }
       }
     })
