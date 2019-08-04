@@ -47,7 +47,7 @@ function main() {
           // TODO: Need to compare and update DB entry with scraped data
 
           // TODO Send email if price changed
-          await email.sendEmail(vendor.url).catch(console.error);
+          //await email.sendEmail(vendor.url).catch(console.error);
         }
       }
     })
