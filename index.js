@@ -61,12 +61,14 @@ function main() {
   // Query products from DB
   Item.find({})
     .then(async items => {
-      // TODO: Need another loop for async call for all items. Currently only handle one item (items[0]);
       // NOTE: forEach is not async use for(of) or promise.all()
-      // GET request to product page for all vendors
+      // Send get request for items
       for (item of items) {
+        
         // display current db item if check debug flag is set
         console.log(debug_f ? item : '');
+        
+        // Send request to product page for all vendors
         for (vendor of item.vendors) {
           const response = await axios.get(vendor.url, {
             headers: {
@@ -75,23 +77,26 @@ function main() {
           });
 
           if (response.status === 200) {
-            // TODO: Need to consider things to scrape
-            // Scrape price element from the response
             const rawHTML = response.data;
             const $ = cheerio.load(rawHTML);
             const priceElement = $("#priceblock_ourprice").text();
+            const productTitle = $("#productTitle").text().trim();
+            const modelNumber = $("#productDetails_techSpec_section_2").wrap();
+            
             console.log
               (priceElement ? 
-                '\'' + item.name + '\': $' + priceElement + ' from ' + item.vendor: 
-                '\'' + item.name + '\'' + ' price is currently not available' + ' from ' + item.vendor);
+                '\'' + productTitle + '\': ' + priceElement + ' from ' + vendor.vendorName : 
+                '\'' + productTitle + '\'' + ' price is currently not available' + ' from ' + vendor.vendorName);
+
+            console.log(debug_f ? productTitle : '');
 
             // TODO: Need to compare and update DB entry with scraped data
 
-            // TODO Send email if price changed
+            // Send email if price changed
             // await email.sendEmail(vendor.url).catch(console.error);
           }
           else {
-            console.log('Response error: ' + renponse.status + ' from ' + item.vendor + ' for item ' + item.name);
+            console.log('Response error: ' + renponse.status + ' from ' + vendor.vendorName + ' for item ' + item.name);
           }
         }
       }
