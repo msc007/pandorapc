@@ -16,7 +16,8 @@ const ItemSchema = new Schema({
       currentPrice: String,
       prevPrice: String
     }
-  ]
+  ],
+  subscribers: [String]
 });
 
 /*
