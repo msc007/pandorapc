@@ -1,61 +1,39 @@
 <!-- Modal -->
-<div
-    class="modal fade"
-    id="subscribeModal"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="subscribeModalLabel"
-    aria-hidden="true"
->
+<div class="modal fade" id="subscribeModal" tabindex="-1" role="dialog" aria-labelledby="subscribeModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
-    <div class="modal-content">
-        <!-- Modal Header -->
-        <div class="modal-header">
-        <h5 class="modal-title" id="subscribeModalLabel">
-            <%= item.name %>
-        </h5>
-        <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-        >
-            <span aria-hidden="true">&times;</span>
-        </button>
-        </div>
-        <!-- Modal Body -->
-        <div class="modal-body">
-        <!-- Modal Form -->
-        <form>
-            <div class="form-group">
-                <label class="col-form-label"
-                    >Subscribe and get email notification when the deal is
-                    arrived.</label
-                >
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                    </div>
-                    <input
-                    type="text"
-                    class="form-control"
-                    id="email"
-                    placeholder="Enter your email"
-                    />
-                </div>
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="subscribeModalLabel">
+                    <%= item.name %>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-        </form>
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <!-- Modal Form -->
+                <form id="subscribeForm">
+                    <div class="form-group">
+                        <label class="col-form-label">Subscribe and get email notification when the deal is
+                            arrived.</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            </div>
+                            <input type="text" class="form-control" id="email" placeholder="Enter your email" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button id="subscribeButton" type="button" class="btn btn-primary">
+                    Subscribe
+                </button>
+            </div>
         </div>
-        <!-- Modal Footer -->
-        <div class="modal-footer">
-        <button
-            type="button"
-            class="btn btn-primary"
-            data-dismiss="modal"
-        >
-            Subscribe
-        </button>
-        </div>
-    </div>
     </div>
 </div>

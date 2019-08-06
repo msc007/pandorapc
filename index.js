@@ -1,6 +1,6 @@
 const express = require('express');
-//const path = require('path');
 const app = express();
+const path = require('path');
 const axios = require('axios');
 const cheerio = require('cheerio');
 const mongoose = require('mongoose');
@@ -10,7 +10,7 @@ const cron = require('node-cron');
 const email = require('./email');
 
 // Set static public directory (for css/jquery/etc...)
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(path.join(__dirname + '/public')));
 
 // Connect to MongoDB
 mongoose
@@ -29,6 +29,12 @@ app.get('/', (req, res) => {
     .catch(err => {
       throw err;
     });
+});
+
+// Subscribe
+app.post('/subscribe', (req, res) => {
+  res.send("POST requested to page")
+
 });
 
 // Start the server
@@ -64,10 +70,10 @@ function main() {
       // NOTE: forEach is not async use for(of) or promise.all()
       // Send get request for items
       for (item of items) {
-        
+
         // display current db item if check debug flag is set
         console.log(debug_f ? item : '');
-        
+
         // Send request to product page for all vendors
         for (vendor of item.vendors) {
           const response = await axios.get(vendor.url, {
@@ -82,10 +88,10 @@ function main() {
             const priceElement = $('#priceblock_ourprice').text();
             const productTitle = $('#productTitle').text().trim();
             const modelNumber = $('#productDetails_techSpec_section_2').wrap();
-            
+
             console.log
-              (priceElement 
-                ? '\'' + productTitle + '\': ' + priceElement + ' from ' + vendor.vendorName 
+              (priceElement
+                ? '\'' + productTitle + '\': ' + priceElement + ' from ' + vendor.vendorName
                 : '\'' + productTitle + '\'' + ' price is currently not available' + ' from ' + vendor.vendorName);
 
             // console.log(debug_f ? productTitle : '');
