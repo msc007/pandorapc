@@ -31,10 +31,10 @@ app.get('/', (req, res) => {
     });
 });
 
-// Subscribe
+// POST request to subscribe
 app.post('/subscribe', (req, res) => {
+  // TODO: need to update subscribers
   res.send("POST requested to page")
-
 });
 
 // Start the server

@@ -4,13 +4,14 @@ $(document).ready(function () {
         // prevent page from refresh
         e.preventDefault();
 
-        // AXIOS Post request
+        // AXIOS POST REQUEST
         subscribeRequest();
 
         // Close modal if subscribed successfully
         $('#subscribeModal').modal('hide');
     });
 });
+
 
 subscribeRequest = async () => {
     const res = await axios.post('http://localhost:5000/subscribe');
