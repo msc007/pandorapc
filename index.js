@@ -12,6 +12,10 @@ const email = require('./email');
 // Set static public directory (for css/jquery/etc...)
 app.use(express.static(path.join(__dirname + '/public')));
 
+// Middlewares for body-parser 
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 // Connect to MongoDB
 mongoose
   .connect(db, { useNewUrlParser: true })
@@ -33,7 +37,20 @@ app.get('/', (req, res) => {
 
 // POST request to subscribe
 app.post('/subscribe', (req, res) => {
-  // TODO: need to update subscribers
+
+  // Push new subscriber to subscribers array
+  Item.update(
+    { name: req.body.itemName },
+    { $addToSet: { "subscribers": req.body.email } }) // Note: $push not used inorder to avoid duplicate email
+    .then(item => {
+      console.log("Subscriber SUCCESSFULLY added!")
+
+    })
+    .catch(err => {
+      console.log("ERROR OCCURED DURING FINDANDUPDATE");
+    })
+
+  // TODO: SNED SUCCESSFUL MESSAGE TO CLIENT
   res.send("POST requested to page")
 });
 
