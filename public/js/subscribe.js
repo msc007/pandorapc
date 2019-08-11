@@ -10,16 +10,23 @@ $(document).ready(function () {
         const itemClicked = $(this).closest('.modal-content').attr('id');
         // Get user email from input text
         const email = $(this).parent().parent().find('input').val();
+        // Get current modalID
+        const modalID = '#' + $(this).closest('.modal').attr('id');
 
-        //TODO: Email Validation need to be perform before axios request
-
-        // AXIOS POST REQUEST to subscribe to a product
-        subscribeRequest(itemClicked, email);
-
-
-        // Close modal if subscribed successfully
-        let modalID = '#' + $(this).closest('.modal').attr('id');
-        $(modalID).modal('hide');
+        // Validate email format
+        if (validator.isEmail(email) && !validator.isEmpty(email)) {
+            // AXIOS POST REQUEST to subscribe to a product
+            subscribeRequest(itemClicked, email);
+            // Close modal if subscribed successfully
+            $(modalID).modal('hide');
+            alert(`Successfully subscirbed to ${itemClicked}`)
+        } else {
+            alert("Invalid email. Please try again!");
+            /*
+            console.log("EMAIL IS INVALID");
+            $(this).parent().parent().find('.input-group').append('<div class="invalid-feedback">Please fill out this field.</div>');
+            */
+        }
     });
 });
 
