@@ -40,15 +40,14 @@ app.post('/subscribe', (req, res) => {
 
   // Push new subscriber to subscribers array
   Item.update(
-    { name: req.body.itemName },
-    { $addToSet: { "subscribers": req.body.email } }) // Note: $push not used inorder to avoid duplicate email
+    { name : req.body.itemName },
+    { $addToSet : { "subscribers" : req.body.email } }) // Note: $push not used inorder to avoid duplicate email
     .then(item => {
-      console.log("Subscriber SUCCESSFULLY added!")
-
+      console.log("Subscriber SUCCESSFULLY added!");
     })
     .catch(err => {
       console.log("ERROR OCCURED DURING FINDANDUPDATE");
-    })
+    });
 
   // TODO: SNED SUCCESSFUL MESSAGE TO CLIENT
   res.send("POST requested to page")
@@ -58,7 +57,7 @@ app.post('/subscribe', (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
-var debug_f = true;
+var debug_f = false;
 
 main();
 
@@ -104,18 +103,23 @@ function main() {
             const $ = cheerio.load(rawHTML);
             const priceElement = $('#priceblock_ourprice').text();
             const productTitle = $('#productTitle').text().trim();
-            const modelNumber = $('#productDetails_techSpec_section_2').wrap();
+            const modelNumber = $('#productDetails_techSpec_section_2 > tbody > tr:nth-child(3) > td').text().trim();
+            
 
             var time = new Date();
             console.log
               (priceElement
                 ? time.toLocaleString() + ': \'' + productTitle + '\': ' + priceElement + ' from ' + vendor.vendorName
                 : time.toLocaleString() + ': \'' + productTitle + '\'' + ' price is currently not available' + ' from ' + vendor.vendorName);
+            console.log(time.toLocaleString() + ': ' + modelNumber);
+            
+            priceElement ? evalPrice(item, vendor, priceElement) : null;
+            updatePrice(item, vendor, priceElement);
 
-            // console.log(debug_f ? productTitle : '');
           }
           else {
-            console.log('Response error: ' + renponse.status + ' from ' + vendor.vendorName + ' for item ' + item.name);
+            console.log(time.toLocaleString() + 
+              ': Response error: ' + renponse.status + ' from ' + vendor.vendorName + ' for item ' + item.name);
           }
           // TODO: Need to compare and update DB entry with scraped data
 
@@ -126,5 +130,24 @@ function main() {
     })
     .catch(err => {
       throw err;
+    });
+}
+function evalPrice(item, vendor, priceElement) {
+  if (vendor.currentPrice <= item.avgPrice) {
+    console.log(time.toLocaleString() + ': Item in good price');
+    sendEmail(vendor.url);
+  }
+}
+function updatePrice(item, vendor, priceElement) {
+  var newAvgPrice = (parseInt(vendor.currentPrice) + item.avgPrice * item.avgCount++) / item.avgCount + 1;
+  var time = new Date();
+  Item.update(
+    { avgPrice : newAvgPrice },
+    { avgCount : item.avgCount ? 1 : item.avgCount + 1 })
+    .then(item => {
+      console.log(time.toLocaleString() + ': Updated item price.');
+    })
+    .catch(err => {
+      console.log(time.toLocaleString() + ': Error updating item price.');
     });
 }

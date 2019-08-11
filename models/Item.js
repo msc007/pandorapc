@@ -17,7 +17,9 @@ const ItemSchema = new Schema({
       prevPrice: String
     }
   ],
-  subscribers: [String]
+  subscribers: [String],
+  avgPrice: String,
+  avgCount: Schema.Types.Decimal128,
 });
 
 /*
