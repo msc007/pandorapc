@@ -106,10 +106,11 @@ function main() {
             const productTitle = $('#productTitle').text().trim();
             const modelNumber = $('#productDetails_techSpec_section_2').wrap();
 
+            var time = new Date();
             console.log
               (priceElement
-                ? '\'' + productTitle + '\': ' + priceElement + ' from ' + vendor.vendorName
-                : '\'' + productTitle + '\'' + ' price is currently not available' + ' from ' + vendor.vendorName);
+                ? time.toLocaleString() + ': \'' + productTitle + '\': ' + priceElement + ' from ' + vendor.vendorName
+                : time.toLocaleString() + ': \'' + productTitle + '\'' + ' price is currently not available' + ' from ' + vendor.vendorName);
 
             // console.log(debug_f ? productTitle : '');
           }
