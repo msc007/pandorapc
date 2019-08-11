@@ -9,7 +9,7 @@ $(document).ready(function () {
         // Get clicked item name
         const itemClicked = $(this).closest('.modal-content').attr('id');
         // Get user email from input text
-        const email = $(this).parent().parent().find('input').val();
+        const email = $(this).closest('.modal-content').find('input').val();
         // Get current modalID
         const modalID = '#' + $(this).closest('.modal').attr('id');
 
