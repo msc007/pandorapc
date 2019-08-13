@@ -57,7 +57,7 @@ app.post('/subscribe', (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
-var debug_f = false;
+var debug_f = true;
 
 main();
 
@@ -88,7 +88,8 @@ function main() {
       for (item of items) {
 
         // display current db item if check debug flag is set
-        console.log(debug_f ? item : '');
+        var time = new Date();
+        // console.log(debug_f ? item : '');
 
         // Send request to product page for all vendors
         for (vendor of item.vendors) {
@@ -105,8 +106,6 @@ function main() {
             const productTitle = $('#productTitle').text().trim();
             const modelNumber = $('#productDetails_techSpec_section_2 > tbody > tr:nth-child(3) > td').text().trim();
             
-
-            var time = new Date();
             console.log
               (priceElement
                 ? time.toLocaleString() + ': \'' + productTitle + '\': ' + priceElement + ' from ' + vendor.vendorName
@@ -133,21 +132,23 @@ function main() {
     });
 }
 function evalPrice(item, vendor, priceElement) {
+  var time = new Date();
   if (vendor.currentPrice <= item.avgPrice) {
     console.log(time.toLocaleString() + ': Item in good price');
-    sendEmail(vendor.url);
+    // sendEmail(vendor.url);
   }
 }
 function updatePrice(item, vendor, priceElement) {
-  var newAvgPrice = (parseInt(vendor.currentPrice) + item.avgPrice * item.avgCount++) / item.avgCount + 1;
+  var newAvgPrice = (parseFloat(vendor.currentPrice) + (parseFloat(item.avgPrice ? item.avgPrice : 0) * item.avgCount)) / item.avgCount + 1;
   var time = new Date();
-  Item.update(
-    { avgPrice : newAvgPrice },
-    { avgCount : item.avgCount ? 1 : item.avgCount + 1 })
-    .then(item => {
-      console.log(time.toLocaleString() + ': Updated item price.');
-    })
-    .catch(err => {
-      console.log(time.toLocaleString() + ': Error updating item price.');
+  console.log(debug_f ? item : 'Not defined');
+  Item.updateOne(
+    { 'modelNumber' : item.modelNumber }, 
+    {
+        $set : { 'avgPrice' : newAvgPrice, 'avgCount' : parseInt(item.avgCount) + 1 }
+    }).then(val => {
+      console.log(time.toLocaleString() + ': ' + item.modelNumber + ' avg price is updated to $' + newAvgPrice);
+    }).catch(err => {
+      console.log(time.toLocaleString() + ': ' + err + ' error updating item price.');
     });
 }
