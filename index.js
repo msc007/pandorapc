@@ -87,9 +87,8 @@ function main() {
       // Send get request for items
       for (item of items) {
 
-        // display current db item if check debug flag is set
-        var time = new Date();
         // console.log(debug_f ? item : '');
+        var time = new Date();
 
         // Send request to product page for all vendors
         for (vendor of item.vendors) {
@@ -112,8 +111,13 @@ function main() {
                 : time.toLocaleString() + ': \'' + productTitle + '\'' + ' price is currently not available' + ' from ' + vendor.vendorName);
             console.log(time.toLocaleString() + ': ' + modelNumber);
             
-            priceElement ? evalPrice(item, vendor, priceElement) : null;
+            var isDeal = evalPrice(priceElement, item.avgPrice);
             updatePrice(item, vendor, priceElement);
+            
+            if (isDeal) {
+              // sendMail(item.url);
+              console.log('Sending email to subscribers.');
+            }
 
           }
           else {
@@ -131,24 +135,31 @@ function main() {
       throw err;
     });
 }
-function evalPrice(item, vendor, priceElement) {
-  var time = new Date();
-  if (vendor.currentPrice <= item.avgPrice) {
-    console.log(time.toLocaleString() + ': Item in good price');
-    // sendEmail(vendor.url);
+function evalPrice(newPrice, previousPrice) {
+  if (!newPrice || !previousPrice) {
+    return false;
+  }
+  // TODO: Could use a better algorithm here to justify a good deal
+  if (newPrice <= previousPrice) {
+    return true;
   }
 }
-function updatePrice(item, vendor, priceElement) {
-  var newAvgPrice = (parseFloat(vendor.currentPrice) + (parseFloat(item.avgPrice ? item.avgPrice : 0) * item.avgCount)) / item.avgCount + 1;
-  var time = new Date();
-  console.log(debug_f ? item : 'Not defined');
-  Item.updateOne(
-    { 'modelNumber' : item.modelNumber }, 
-    {
-        $set : { 'avgPrice' : newAvgPrice, 'avgCount' : parseInt(item.avgCount) + 1 }
-    }).then(val => {
-      console.log(time.toLocaleString() + ': ' + item.modelNumber + ' avg price is updated to $' + newAvgPrice);
-    }).catch(err => {
+function updatePrice(item, vendor, newPrice) {
+  var newAveragePrice = (parseFloat(newPrice) + (parseFloat(item.averagePrice ? item.averagePrice : 0) * item.averageCount)) / (item.averageCount + 1);
+  Item.update(
+    { 'modelNumber' : item.modelNumber, 'vendors.name' : vendor.name }, 
+    { $set : { 
+      'averagePrice' : newAveragePrice, 
+      'averageCount' : parseInt(item.averageCount) + 1,
+      'vendors.$.currentPrice' : newPrice }})
+    .then(val => {
+      console.log(time.toLocaleString() + ': ' + item.modelNumber + ' average price is updated to $' + newAveragePrice)})
+      // console.log(val)})
+    .catch(err => {
       console.log(time.toLocaleString() + ': ' + err + ' error updating item price.');
     });
 }
+// TODO: change DB field names
+// db.items.update({}, {$rename:{avgPrice:"averagePrice"}}, { upsert:false, multi:true });
+// db.items.update({}, {$rename:{avgCount:"averageCount"}}, { upsert:false, multi:true });
+// db.items.updateMany( {}, { $rename: { "oldname": "newname" } } )
