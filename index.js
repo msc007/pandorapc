@@ -57,7 +57,7 @@ app.post('/subscribe', (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
-var debug_f = true;
+var isDebug = true;
 
 main();
 
@@ -77,20 +77,17 @@ main();
 
 // Get a product price from Amazon
 function main() {
-  const userAgent =
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36';
+  const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+    + 'Chrome/75.0.3770.100 Safari/537.36';
 
   // Query products from DB
   Item.find({})
     .then(async items => {
       // NOTE: forEach is not async use for(of) or promise.all()
-      // Send get request for items
       for (item of items) {
-
-        // console.log(debug_f ? item : '');
+        // console.log(isDebug ? item : '');
         var time = new Date();
 
-        // Send request to product page for all vendors
         for (vendor of item.vendors) {
           const response = await axios.get(vendor.url, {
             headers: {
@@ -98,36 +95,32 @@ function main() {
             }
           });
 
-          if (response.status === 200) {
-            const rawHTML = response.data;
-            const $ = cheerio.load(rawHTML);
-            const priceElement = $('#priceblock_ourprice').text();
-            const productTitle = $('#productTitle').text().trim();
-            const modelNumber = $('#productDetails_techSpec_section_2 > tbody > tr:nth-child(3) > td').text().trim();
-            
-            console.log
-              (priceElement
-                ? time.toLocaleString() + ': \'' + productTitle + '\': ' + priceElement + ' from ' + vendor.vendorName
-                : time.toLocaleString() + ': \'' + productTitle + '\'' + ' price is currently not available' + ' from ' + vendor.vendorName);
-            console.log(time.toLocaleString() + ': ' + modelNumber);
-            
-            var isDeal = evalPrice(priceElement, item.avgPrice);
-            updatePrice(item, vendor, priceElement);
-            
-            if (isDeal) {
-              // sendMail(item.url);
-              console.log('Sending email to subscribers.');
-            }
-
-          }
-          else {
+          if (response.status !== 200) {
             console.log(time.toLocaleString() + 
               ': Response error: ' + renponse.status + ' from ' + vendor.vendorName + ' for item ' + item.name);
+            continue;
           }
-          // TODO: Need to compare and update DB entry with scraped data
+          
+          const rawHTML = response.data;
+          const $ = cheerio.load(rawHTML);
+          const priceElement = $('#priceblock_ourprice').text();
+          const productTitle = $('#productTitle').text().trim();
+          const modelNumber = $('#productDetails_techSpec_section_2 > tbody > tr:nth-child(3) > td').text().trim();
+          
+          console.log(
+            priceElement
+              ? time.toLocaleString() + ': \'' + modelNumber + '\': ' + priceElement + 
+                ' from ' + vendor.vendorName
+              : time.toLocaleString() + ': \'' + modelNumber + '\'' + 
+                ' price is currently not available' + ' from ' + vendor.vendorName);
+          
+          var isDeal = evalPrice(priceElement, item.meanPrice);
+          updatePrice(item, vendor, priceElement);
 
-          // Send email if price changed
-          // await email.sendEmail(vendor.url).catch(console.error);
+          if (isDeal) {
+            // await email.sendEmail(vendor.url).catch(console.error);
+            console.log('Sending email to subscribers.');
+          }
         }
       }
     })
@@ -135,6 +128,7 @@ function main() {
       throw err;
     });
 }
+
 function evalPrice(newPrice, previousPrice) {
   if (!newPrice || !previousPrice) {
     return false;
@@ -144,22 +138,24 @@ function evalPrice(newPrice, previousPrice) {
     return true;
   }
 }
+
 function updatePrice(item, vendor, newPrice) {
-  var newAveragePrice = (parseFloat(newPrice) + (parseFloat(item.averagePrice ? item.averagePrice : 0) * item.averageCount)) / (item.averageCount + 1);
+  var newMeanPrice = (parseFloat(newPrice) + (parseFloat(item.meanPrice ? item.meanPrice : 0) * item.meanCount)) / (item.meanCount + 1);
   Item.update(
     { 'modelNumber' : item.modelNumber, 'vendors.name' : vendor.name }, 
     { $set : { 
-      'averagePrice' : newAveragePrice, 
-      'averageCount' : parseInt(item.averageCount) + 1,
+      'meanPrice' : newMeanPrice, 
+      'meanCount' : parseInt(item.meanCount) + 1,
       'vendors.$.currentPrice' : newPrice }})
     .then(val => {
-      console.log(time.toLocaleString() + ': ' + item.modelNumber + ' average price is updated to $' + newAveragePrice)})
+      console.log(time.toLocaleString() + ': ' + item.modelNumber + ' mean price is updated to $' + newMeanPrice)})
       // console.log(val)})
     .catch(err => {
       console.log(time.toLocaleString() + ': ' + err + ' error updating item price.');
-    });
+  });
 }
 // TODO: change DB field names
-// db.items.update({}, {$rename:{avgPrice:"averagePrice"}}, { upsert:false, multi:true });
-// db.items.update({}, {$rename:{avgCount:"averageCount"}}, { upsert:false, multi:true });
+// db.items.update({}, {$rename:{avgPrice:"meanPrice"}}, { upsert:false, multi:true });
+// db.items.update({}, {$rename:{avgCount:"meanCount"}}, { upsert:false, multi:true });
 // db.items.updateMany( {}, { $rename: { "oldname": "newname" } } )
+// db.items.updateMany( {}, { $rename: { "currentPrice": "lastPrice" } } )
