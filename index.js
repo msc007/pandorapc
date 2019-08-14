@@ -102,7 +102,8 @@ function main() {
           
           const rawHTML = response.data;
           const $ = cheerio.load(rawHTML);
-          const priceElement = $('#priceblock_ourprice').text();
+          var priceText = $('#priceblock_ourprice').text();
+          const priceElement = priceText ? priceText.slice(1, priceText.length) : 0;
           const productTitle = $('#productTitle').text().trim();
           const modelNumber = $('#productDetails_techSpec_section_2 > tbody > tr:nth-child(3) > td').text().trim();
           
@@ -131,18 +132,29 @@ function main() {
 
 function evalPrice(newPrice, previousPrice) {
   // TODO: Could use a better algorithm here to justify a good deal
-  if (!newPrice || !previousPrice || (newPrice > previousPrice)) {
+  if (!newPrice || !previousPrice || (parseFloat(newPrice) > parseFloat(previousPrice))) {
     return false;
   }
   return true;
 }
 
 function updatePrice(item, vendor, newPrice) {
-  var newMeanPrice = (parseFloat(newPrice) + (parseFloat(item.meanPrice ? item.meanPrice : 0) * item.meanCount)) / (item.meanCount + 1);
-  Item.update(
+  if (!newPrice) {
+    console.log(time.toLocaleString() + ': \'' + item.modelNumber + '\'' + 
+    ' price is cannot be updated.');
+    return;
+  }
+  var newMeanPrice = (parseFloat(newPrice) + (parseFloat(item.meanPrice ? item.meanPrice : 0) * parseFloat(item.meanCount))) / (parseFloat(item.meanCount) + 1.0);
+  console.log(isDebug ? item : '');
+  console.log('parseFloat(newPrice): ' + parseFloat(newPrice));
+  console.log('parseFloat(newMeanPrice): ' + parseFloat(newMeanPrice));
+  console.log('parseFloat(item.meanPrice ? item.meanPrice : 0): ' + parseFloat(item.meanPrice ? item.meanPrice : 0));
+  console.log('item.meanCount: ' + parseInt(item.meanCount));
+  console.log('item.meanCount + 1: ' + (parseInt(item.meanCount) + 1));
+  Item.updateOne(
     { 'modelNumber' : item.modelNumber, 'vendors.name' : vendor.name }, 
     { $set : { 
-      'meanPrice' : newMeanPrice, 
+      'meanPrice' : parseFloat(newMeanPrice), 
       'meanCount' : parseInt(item.meanCount) + 1,
       'vendors.$.currentPrice' : newPrice }})
     .then(val => {
@@ -155,5 +167,5 @@ function updatePrice(item, vendor, newPrice) {
 // TODO: change DB field names
 // db.items.update({}, {$rename:{avgPrice:"meanPrice"}}, { upsert:false, multi:true });
 // db.items.update({}, {$rename:{avgCount:"meanCount"}}, { upsert:false, multi:true });
-// db.items.updateMany( {}, { $rename: { "oldname": "newname" } } )
-// db.items.updateMany( {}, { $rename: { "currentPrice": "lastPrice" } } )
+// db.items.updateMany( {}, { $rename: { vendors.currentPrice: "vendors.lastPrice" } } )
+// db.items.update({}, {$rename:{vendors.currentPrice:"vendors.lastPrice"}}, { upsert:false, multi:true });

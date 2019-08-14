@@ -18,8 +18,8 @@ const ItemSchema = new Schema({
     }
   ],
   subscribers: [String],
-  avgPrice: String,
-  avgCount: String,
+  meanPrice: String,
+  meanCount: String,
 });
 
 /*
