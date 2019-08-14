@@ -58,6 +58,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
 var isDebug = true;
+var time = new Date();
 
 main();
 
@@ -86,8 +87,6 @@ function main() {
       // NOTE: forEach is not async use for(of) or promise.all()
       for (item of items) {
         // console.log(isDebug ? item : '');
-        var time = new Date();
-
         for (vendor of item.vendors) {
           const response = await axios.get(vendor.url, {
             headers: {
@@ -96,8 +95,8 @@ function main() {
           });
 
           if (response.status !== 200) {
-            console.log(time.toLocaleString() + 
-              ': Response error: ' + renponse.status + ' from ' + vendor.vendorName + ' for item ' + item.name);
+            console.log(time.toLocaleString() + ': Response error: ' + 
+              renponse.status + ' from ' + vendor.vendorName + ' for item ' + item.name);
             continue;
           }
           
@@ -112,15 +111,16 @@ function main() {
               ? time.toLocaleString() + ': \'' + modelNumber + '\': ' + priceElement + 
                 ' from ' + vendor.vendorName
               : time.toLocaleString() + ': \'' + modelNumber + '\'' + 
-                ' price is currently not available' + ' from ' + vendor.vendorName);
+                ' price is currently not available from ' + vendor.vendorName);
           
           var isDeal = evalPrice(priceElement, item.meanPrice);
-          updatePrice(item, vendor, priceElement);
 
           if (isDeal) {
             // await email.sendEmail(vendor.url).catch(console.error);
             console.log('Sending email to subscribers.');
           }
+          
+          updatePrice(item, vendor, priceElement);
         }
       }
     })
@@ -130,13 +130,11 @@ function main() {
 }
 
 function evalPrice(newPrice, previousPrice) {
-  if (!newPrice || !previousPrice) {
+  // TODO: Could use a better algorithm here to justify a good deal
+  if (!newPrice || !previousPrice || (newPrice > previousPrice)) {
     return false;
   }
-  // TODO: Could use a better algorithm here to justify a good deal
-  if (newPrice <= previousPrice) {
-    return true;
-  }
+  return true;
 }
 
 function updatePrice(item, vendor, newPrice) {
