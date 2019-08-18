@@ -8,7 +8,6 @@ const ItemSchema = new Schema({
   description: String,
   modelNumber: String,
   itemNumber: String,
-  vendorName: String,
   vendors: [
     {
       vendorName: String,
@@ -18,8 +17,8 @@ const ItemSchema = new Schema({
     }
   ],
   subscribers: [String],
-  avgPrice: String,
-  avgCount: String,
+  meanPrice: String,
+  meanCount: String,
 });
 
 /*
