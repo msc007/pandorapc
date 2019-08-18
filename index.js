@@ -144,13 +144,14 @@ function updatePrice(item, vendor, newPrice) {
     ' price is cannot be updated.');
     return;
   }
-  var newMeanPrice = (parseFloat(newPrice) + (parseFloat(item.meanPrice ? item.meanPrice : 0) * parseFloat(item.meanCount))) / (parseFloat(item.meanCount) + 1.0);
+  newPrice = parseFloat(newPrice).toFixed(2);
+  var meanCount = parseInt(item.meanCount);
+  var meanPrice = parseFloat(item.meanPrice ? item.meanPrice : 0).toFixed(2);
+  var newMeanPrice = (parseFloat(parseFloat(newPrice) + parseFloat(meanPrice * meanCount)) / parseFloat(meanCount + 1)).toFixed(2);
+  
   console.log(isDebug ? item : '');
-  console.log('parseFloat(newPrice): ' + parseFloat(newPrice));
-  console.log('parseFloat(newMeanPrice): ' + parseFloat(newMeanPrice));
-  console.log('parseFloat(item.meanPrice ? item.meanPrice : 0): ' + parseFloat(item.meanPrice ? item.meanPrice : 0));
-  console.log('item.meanCount: ' + parseInt(item.meanCount));
-  console.log('item.meanCount + 1: ' + (parseInt(item.meanCount) + 1));
+  isDebug ? printPrice(newPrice, meanPrice, item.meanCount, newMeanPrice) : null;
+
   Item.updateOne(
     { 'modelNumber' : item.modelNumber, 'vendors.name' : vendor.name }, 
     { $set : { 
@@ -163,6 +164,14 @@ function updatePrice(item, vendor, newPrice) {
     .catch(err => {
       console.log(time.toLocaleString() + ': ' + err + ' error updating item price.');
   });
+}
+
+function printPrice(newPrice, meanPrice, meanCount, newMeanPrice) {
+  console.log('newPrice: ' + newPrice);
+  console.log('meanPrice: ' + parseFloat(meanPrice).toFixed(2));
+  console.log('meanCount: ' + parseInt(item.meanCount).toFixed(2));
+  console.log('meanPrice * meanCount: ' + parseFloat(meanPrice * meanCount).toFixed(2));
+  console.log('newMeanPrice: ' + newMeanPrice);
 }
 // TODO: change DB field names
 // db.items.update({}, {$rename:{avgPrice:"meanPrice"}}, { upsert:false, multi:true });

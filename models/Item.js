@@ -8,7 +8,6 @@ const ItemSchema = new Schema({
   description: String,
   modelNumber: String,
   itemNumber: String,
-  vendorName: String,
   vendors: [
     {
       vendorName: String,
