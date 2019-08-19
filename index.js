@@ -57,8 +57,8 @@ app.post('/subscribe', (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
-var isDebug = true;
-var time = new Date();
+let isDebug = true;
+let time = new Date();
 
 main();
 
@@ -102,7 +102,7 @@ function main() {
           
           const rawHTML = response.data;
           const $ = cheerio.load(rawHTML);
-          var priceText = $('#priceblock_ourprice').text();
+          let priceText = $('#priceblock_ourprice').text();
           const priceElement = priceText ? priceText.slice(1, priceText.length) : 0;
           const productTitle = $('#productTitle').text().trim();
           const modelNumber = $('#productDetails_techSpec_section_2 > tbody > tr:nth-child(3) > td').text().trim();
@@ -114,14 +114,15 @@ function main() {
               : time.toLocaleString() + ': \'' + modelNumber + '\'' + 
                 ' price is currently not available from ' + vendor.vendorName);
           
-          var isDeal = evalPrice(priceElement, item.meanPrice);
-
+          let isDeal = evalPrice(priceElement, item.meanPrice);
           if (isDeal) {
             // await email.sendEmail(vendor.url).catch(console.error);
             console.log('Sending email to subscribers.');
           }
           
-          updatePrice(item, vendor, priceElement);
+          let newMeanPrice = getMeanPrice(item, priceElement);
+          isDebug && newMeanPrice ? printPrice(newMeanPrice, item.meanPrice, item.meanCount, newMeanPrice) : null;
+          newMeanPrice ? updatePrice(item, vendor, newMeanPrice, newMeanPrice) : null;
         }
       }
     })
@@ -138,20 +139,19 @@ function evalPrice(newPrice, previousPrice) {
   return true;
 }
 
-function updatePrice(item, vendor, newPrice) {
+function getMeanPrice(item, newPrice) {
   if (!newPrice) {
     console.log(time.toLocaleString() + ': \'' + item.modelNumber + '\'' + 
     ' price is cannot be updated.');
     return;
   }
   newPrice = parseFloat(newPrice).toFixed(2);
-  var meanCount = parseInt(item.meanCount);
-  var meanPrice = parseFloat(item.meanPrice ? item.meanPrice : 0).toFixed(2);
-  var newMeanPrice = (parseFloat(parseFloat(newPrice) + parseFloat(meanPrice * meanCount)) / parseFloat(meanCount + 1)).toFixed(2);
-  
-  console.log(isDebug ? item : '');
-  isDebug ? printPrice(newPrice, meanPrice, item.meanCount, newMeanPrice) : null;
+  let meanCount = parseInt(item.meanCount);
+  let meanPrice = parseFloat(item.meanPrice ? item.meanPrice : 0).toFixed(2);
+  return (parseFloat(parseFloat(newPrice) + parseFloat(meanPrice * meanCount)) / parseFloat(meanCount + 1)).toFixed(2);
+}
 
+  function updatePrice(item, vendor, newPrice, newMeanPrice) {
   Item.updateOne(
     { 'modelNumber' : item.modelNumber, 'vendors.name' : vendor.name }, 
     { $set : { 
@@ -164,6 +164,9 @@ function updatePrice(item, vendor, newPrice) {
     .catch(err => {
       console.log(time.toLocaleString() + ': ' + err + ' error updating item price.');
   });
+
+  console.log('');
+  return;
 }
 
 function printPrice(newPrice, meanPrice, meanCount, newMeanPrice) {
@@ -172,9 +175,20 @@ function printPrice(newPrice, meanPrice, meanCount, newMeanPrice) {
   console.log('meanCount: ' + parseInt(item.meanCount).toFixed(2));
   console.log('meanPrice * meanCount: ' + parseFloat(meanPrice * meanCount).toFixed(2));
   console.log('newMeanPrice: ' + newMeanPrice);
+  return;
 }
-// TODO: change DB field names
-// db.items.update({}, {$rename:{avgPrice:"meanPrice"}}, { upsert:false, multi:true });
-// db.items.update({}, {$rename:{avgCount:"meanCount"}}, { upsert:false, multi:true });
-// db.items.updateMany( {}, { $rename: { vendors.currentPrice: "vendors.lastPrice" } } )
-// db.items.update({}, {$rename:{vendors.currentPrice:"vendors.lastPrice"}}, { upsert:false, multi:true });
+
+function resetDbPrice() {
+  Item.updateMany({}, 
+    { $set : { 
+      'meanPrice' : 0, 
+      'meanCount' : 0,
+      'vendors.$.currentPrice' : 0 }})
+    .then(val => {
+      console.log(time.toLocaleString() + ': ' + item.modelNumber + ' mean price is updated to $' + newMeanPrice)})
+      // console.log(val)})
+    .catch(err => {
+      console.log(time.toLocaleString() + ': ' + err + ' error updating item price.');
+  });
+  return;
+}
