@@ -114,9 +114,10 @@ function main() {
               : time.toLocaleString() + ': \'' + modelNumber + '\'' + 
                 ' price is currently not available from ' + vendor.vendorName);
           
+          // Evaluate deal and send email notification if the item is on deal.
           let isDeal = evalPrice(priceElement, item.meanPrice);
-          if (isDeal) {
-            // await email.sendEmail(vendor.url).catch(console.error);
+          if (isDeal && item.subscribers.length !== 0) {
+            //await email.sendEmail(vendor.url, item).catch(console.error);
             console.log('Sending email to subscribers.');
           }
           
@@ -139,6 +140,7 @@ function evalPrice(newPrice, previousPrice) {
   return true;
 }
 
+// TODO: seems like need to check if the price scraped is actually a new price
 function getMeanPrice(item, newPrice) {
   if (!newPrice) {
     console.log(time.toLocaleString() + ': \'' + item.modelNumber + '\'' + 

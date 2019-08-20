@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 
 // async..await is not allowed in global scope, must use a wrapper
-async function sendEmail(url) {
+async function sendEmail(url, item) {
   const user = "pandorapcparts@gmail.com";
   const pass = "ughlscdwdnhrwrcp";
 
@@ -18,13 +18,15 @@ async function sendEmail(url) {
 
   console.log("Transporter created successfully");
 
-  // send mail with defined transport object
+  //send deal notification to the subscribers
   let info = await transporter.sendMail({
     from: `"PandoraPC" <${user}>`,
-    to: "tl492@hotmail.com", // list of receivers
-    subject: "Ryzen CPU deal is arrived!",
-    text: `The Price of ${url} fell down Check it out!!`
+    to: `${item.subscribers.join()}`, // list of receivers
+    subject: `${item.name} now on sale!!`,
+    text: `${item.name} price dropped, you can check out at: \n ${url}`
   });
+  
+
 
   console.log("Message sent: %s", info.messageId);
 }
