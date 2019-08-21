@@ -4,8 +4,6 @@ $(document).ready(function () {
     $('[id=subscribeButton]').on('click', function (e) {
         // prevent page from refresh
         e.preventDefault();
-
-
         // Get clicked item name
         const itemClicked = $(this).closest('.modal-content').attr('id');
         // Get user email from input text
@@ -15,26 +13,27 @@ $(document).ready(function () {
 
         // Validate email format
         if (validator.isEmail(email) && !validator.isEmpty(email)) {
-            // AXIOS POST REQUEST to subscribe to a product
-            subscribeRequest(itemClicked, email);
+            // AXIOS POST request to subscribe to a product
+            const isSubscribed = subscribeRequest(itemClicked, email);
             // Close modal if subscribed successfully
             $(modalID).modal('hide');
-            alert(`Successfully subscirbed to ${itemClicked}`)
         } else {
             alert("Invalid email. Please try again!");
-            /*
-            console.log("EMAIL IS INVALID");
-            $(this).parent().parent().find('.input-group').append('<div class="invalid-feedback">Please fill out this field.</div>');
-            */
         }
     });
 });
 
 subscribeRequest = async (itemClicked, email) => {
+    // Make POST request to add a subscriber for currently clicked item
     const res = await axios.post('http://localhost:5000/subscribe', {
         itemName: itemClicked,
         email: email
     });
-    console.log(res.status);
-    console.log(res.data);
+
+    // Alert message based on the status of subscribe
+    if(res.data.isSubscribed) {
+        alert(`Your email is already subscribed to ${itemClicked}.`);
+    } else {
+        alert(`Successfully subscribed to ${itemClicked}.`);
+    }
 }

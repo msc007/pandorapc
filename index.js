@@ -38,19 +38,29 @@ app.get('/', (req, res) => {
 // POST request to subscribe
 app.post('/subscribe', (req, res) => {
 
-  // Push new subscriber to subscribers array
-  Item.update(
-    { name : req.body.itemName },
-    { $addToSet : { "subscribers" : req.body.email } }) // Note: $push not used inorder to avoid duplicate email
+  Item.findOne({ name: req.body.itemName, subscribers: req.body.email })
     .then(item => {
-      console.log("Subscriber SUCCESSFULLY added!");
+      let isSubscribed = false;
+      if(item) {
+        isSubscribed = true;
+      } else {
+        // Push new subscriber to subscribers array
+        Item.updateOne(
+          { name : req.body.itemName },
+          { $addToSet : { "subscribers" : req.body.email } }) // Note: $push not used inorder to avoid duplicate email
+          .then(item => {
+            console.log("Subscriber SUCCESSFULLY added!");
+          })
+          .catch(err => {
+            console.log("ERROR OCCURED DURING FINDANDUPDATE");
+          });
+      }
+
+      res.send({isSubscribed: isSubscribed})
     })
     .catch(err => {
-      console.log("ERROR OCCURED DURING FINDANDUPDATE");
+      console.log("Error occured during subscribe");
     });
-
-  // TODO: SNED SUCCESSFUL MESSAGE TO CLIENT
-  res.send("POST requested to page")
 });
 
 // Start the server
@@ -140,7 +150,7 @@ function evalPrice(newPrice, previousPrice) {
   return true;
 }
 
-// TODO: seems like need to check if the price scraped is actually a new price
+// TODO: seems like we need to check if the price scraped is actually a new price
 function getMeanPrice(item, newPrice) {
   if (!newPrice) {
     console.log(time.toLocaleString() + ': \'' + item.modelNumber + '\'' + 
