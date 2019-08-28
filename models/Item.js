@@ -19,6 +19,7 @@ const ItemSchema = new Schema({
   subscribers: [String],
   meanPrice: String,
   meanCount: String,
+  availability: Boolean,
 });
 
 /*
