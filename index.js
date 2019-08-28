@@ -132,12 +132,9 @@ function main() {
           }
 
           let newMeanPrice = getMeanPrice(item, priceElement);
-          // If there is no newMeanPrice, Availiability to out-of-stock
-          if (!newMeanPrice) {
-            updateAvailability(item);
-          }
           isDebug && newMeanPrice ? printPrice(newMeanPrice, item.meanPrice, item.meanCount, newMeanPrice) : null;
-          newMeanPrice ? updatePrice(item, vendor, newMeanPrice, newMeanPrice) : null;
+          // If new meanprice exist update the price, otherwise change availiability to out-of-stock
+          newMeanPrice ? updatePrice(item, vendor, newMeanPrice, newMeanPrice) : updateAvailability(item);
         }
       }
     })
