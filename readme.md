@@ -21,6 +21,7 @@
    - pm2 stop
    - pm2 restart
    - pm2 delete
+   - pm2 logs [optional:appName]
 
 - ## List of mongoshell commands ##
    - show dbs
