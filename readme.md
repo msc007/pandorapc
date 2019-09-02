@@ -34,5 +34,6 @@
    - ## To export database ##
    - mongoexport --db pandorapc --collection items --out ./db/items.json   
 
-
-   
+- ## Nginx server ##
+   - Config file location: /etc/nginx/sites-available/default
+   - To apply config changes: sudo service nginx restart
