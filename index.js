@@ -83,10 +83,7 @@ let time;
 
 cron.schedule('0 0 */1 * * *', () => {
   time = new Date();
-  main().catch(err => {
-    console.log(err);
-  });
-
+  main();
   console.log('Scheduled task running every hour at 0 second and 0 minute.');
 });
 
