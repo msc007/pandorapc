@@ -10,7 +10,7 @@ const cron = require('node-cron');
 const email = require('./email');
 
 // Set static public directory (for css/jquery/etc...)
-app.use(express.static(path.join(__dirname + '/public')));
+//app.use(express.static(path.join(__dirname + '/public')));
 
 // Middlewares for body-parser 
 app.use(express.urlencoded({ extended: true }));
@@ -70,7 +70,7 @@ app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 let isDebug = true;
 let time = new Date();
 
-main();
+//main();
 
 /* NOTE ABOUT CRON:
  * Second(0-59)
@@ -81,10 +81,10 @@ main();
  * Day of Week(0-7) 0 and 7 is sunday
  */
 
-// cron.schedule('0 0 */1 * * *', () => {
-//  main().catch(console.error);
-//  console.log('Scheduled task running every hour at 0 second and 0 minute.');
-//});
+cron.schedule('0 0 */1 * * *', () => {
+  main().catch(console.error);
+  console.log('Scheduled task running every hour at 0 second and 0 minute.');
+});
 
 // Get a product price from Amazon
 function main() {
