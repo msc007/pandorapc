@@ -1,1 +1,3 @@
 /node_modules
+/mongod.sh
+/server.sh
