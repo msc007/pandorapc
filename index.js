@@ -10,7 +10,7 @@ const cron = require('node-cron');
 const email = require('./email');
 
 // Set static public directory (for css/jquery/etc...)
-//app.use(express.static(path.join(__dirname + '/public')));
+// app.use(express.static(path.join(__dirname + '/public')));
 
 // Middlewares for body-parser 
 app.use(express.urlencoded({ extended: true }));
@@ -68,9 +68,9 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
 let isDebug = true;
-let time = new Date();
+let time;
 
-//main();
+// main();
 
 /* NOTE ABOUT CRON:
  * Second(0-59)
@@ -82,7 +82,11 @@ let time = new Date();
  */
 
 cron.schedule('0 0 */1 * * *', () => {
-  main().catch(console.error);
+  time = new Date();
+  main().catch(err => {
+    console.log(err);
+  });
+
   console.log('Scheduled task running every hour at 0 second and 0 minute.');
 });
 
