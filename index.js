@@ -136,6 +136,8 @@ function main() {
           isDebug && newMeanPrice ? printPrice(newMeanPrice, item.meanPrice, item.meanCount, newMeanPrice) : null;
           // If new meanprice exist update the price, otherwise change availiability to out-of-stock
           newMeanPrice ? updatePrice(item, vendor, newMeanPrice, newMeanPrice) : updateAvailability(item);
+
+          // TODO: might be better to handle db's availability field is null
         }
       }
     })
@@ -152,7 +154,6 @@ function evalPrice(newPrice, previousPrice) {
   return true;
 }
 
-// TODO: seems like we need to check if the price scraped is actually a new price
 function getMeanPrice(item, newPrice) {
   if (!newPrice) {
     console.log(time.toLocaleString() + ': \'' + item.modelNumber + '\'' +
@@ -176,14 +177,13 @@ function updatePrice(item, vendor, newPrice, newMeanPrice) {
       }
     })
     .then(val => {
-      console.log(time.toLocaleString() + ': ' + item.modelNumber + ' mean price is updated to $' + newMeanPrice)
+      console.log(time.toLocaleString() + ': ' + item.modelNumber + ' mean price is updated to $' + newMeanPrice + '\n');
     })
     // console.log(val)})
     .catch(err => {
       console.log(time.toLocaleString() + ': ' + err + ' error updating item price.');
     });
 
-  console.log('');
   return;
 }
 
