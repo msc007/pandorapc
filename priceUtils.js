@@ -8,7 +8,7 @@ function evalPrice(newPrice, previousPrice) {
 
 function getMeanPrice(item, newPrice) {
   if (!newPrice) {
-    console.log(time.toLocaleString() + ': \'' + item.modelNumber + '\'' + ' price is cannot be updated.');
+    console.log(new Date().toLocaleString() + ': \'' + item.modelNumber + '\'' + ' price is cannot be updated.');
     return;
   }
   newPrice = parseFloat(newPrice).toFixed(2);
@@ -18,8 +18,6 @@ function getMeanPrice(item, newPrice) {
   //TODO: It seems like below code is same as above, also if newPrice consider change newPrice to number type
   //return ((parseFloat(newPrice) + (meanPrice * meanCount)) / (meanCount + 1)).toFixed(2);
 }
-
-
 
 function printPrice(newPrice, meanPrice, meanCount, newMeanPrice) {
   console.log('newPrice: ' + newPrice);
