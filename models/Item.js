@@ -19,7 +19,10 @@ const ItemSchema = new Schema({
   subscribers: [String],
   meanPrice: String,
   meanCount: String,
-  availability: Boolean,
+  availability: {
+    type: Boolean,
+    default: true
+  }
 });
 
 /* FUNCTIONS ItemSchema */
@@ -28,7 +31,7 @@ ItemSchema.statics.updatePrice = function (item, vendor, newPrice, newMeanPrice)
     { 'modelNumber': item.modelNumber, 'vendors.name': vendor.name },
     {
       $set: {
-        'meanPrice': parseFloat(newMeanPrice),
+        'meanPrice': newMeanPrice,
         'meanCount': parseInt(item.meanCount) + 1,
         'vendors.$.currentPrice': newPrice
       }
@@ -77,10 +80,6 @@ ItemSchema.statics.resetDbPrice = function () {
     });
   return;
 }
-
-
-
-
 
 /*
  * Note: Mongoose automatically looks for the plural, lowercased version of your model name.
