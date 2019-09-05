@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index",
+    "start": "export NODE_ENV=production && node index",
     "dev": "nodemon index"
   },
   "keywords": [],

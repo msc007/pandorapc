@@ -9,9 +9,12 @@ const db = require('./config/keys').MongoURI;
 const cron = require('node-cron');
 const email = require('./email');
 const priceUtils = require('./priceUtils');
+const env = process.env.NODE_ENV || 'dev';
 
-// Set static public directory (for css/jquery/etc...)
-app.use(express.static(path.join(__dirname + '/public')));
+if (env === 'dev') {
+  // Set static public directory (for css/jquery/etc...)
+  app.use(express.static(path.join(__dirname + '/public')));
+}
 
 // Middlewares for body-parser 
 app.use(express.urlencoded({ extended: true }));
