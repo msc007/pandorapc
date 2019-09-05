@@ -22,6 +22,66 @@ const ItemSchema = new Schema({
   availability: Boolean,
 });
 
+/* FUNCTIONS ItemSchema */
+ItemSchema.statics.updatePrice = function (item, vendor, newPrice, newMeanPrice) {
+  this.updateOne(
+    { 'modelNumber': item.modelNumber, 'vendors.name': vendor.name },
+    {
+      $set: {
+        'meanPrice': parseFloat(newMeanPrice),
+        'meanCount': parseInt(item.meanCount) + 1,
+        'vendors.$.currentPrice': newPrice
+      }
+    })
+    .then(val => {
+      console.log(new Date().toLocaleString() + ': ' + item.modelNumber + ' mean price is updated to $' + newMeanPrice + '\n');
+    })
+    // console.log(val)})
+    .catch(err => {
+      console.log(new Date().toLocaleString() + ': ' + err + ' error updating item price.');
+    });
+}
+
+ItemSchema.statics.updateAvailability = function (item) {
+  this.updateOne(
+    { 'modelNumber': item.modelNumber },
+    {
+      $set: {
+        'availability': false,
+      }
+    })
+    .then(val => {
+      console.log(new Date().toLocaleString() + ': ' + item.modelNumber + ' Availability updated to false')
+    })
+    // console.log(val)})
+    .catch(err => {
+      console.log(new Date().toLocaleString() + ': ' + err + ' error updating item availiability.');
+    });
+}
+
+ItemSchema.statics.resetDbPrice = function () {
+  this.updateMany({},
+    {
+      $set: {
+        'meanPrice': 0,
+        'meanCount': 0,
+        'vendors.$.currentPrice': 0
+      }
+    })
+    .then(val => {
+      console.log(new Date().toLocaleString() + ': ' + item.modelNumber + ' mean price is updated to $' + newMeanPrice)
+    })
+    // console.log(val)})
+    .catch(err => {
+      console.log(new Date().toLocaleString() + ': ' + err + ' error updating item price.');
+    });
+  return;
+}
+
+
+
+
+
 /*
  * Note: Mongoose automatically looks for the plural, lowercased version of your model name.
  * i.e) Item -> items collection

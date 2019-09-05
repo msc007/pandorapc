@@ -8,6 +8,7 @@ const Item = require('./models/Item');
 const db = require('./config/keys').MongoURI;
 const cron = require('node-cron');
 const email = require('./email');
+const priceUtils = require('./priceUtils');
 
 // Set static public directory (for css/jquery/etc...)
 app.use(express.static(path.join(__dirname + '/public')));
@@ -37,7 +38,6 @@ app.get('/', (req, res) => {
 
 // POST request to subscribe
 app.post('/subscribe', (req, res) => {
-
   Item.findOne({ name: req.body.itemName, subscribers: req.body.email })
     .then(item => {
       let isSubscribed = false;
@@ -68,7 +68,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
 let isDebug = true;
-let time = new Date();
 
 main();
 
@@ -106,7 +105,7 @@ function main() {
           });
 
           if (response.status !== 200) {
-            console.log(time.toLocaleString() + ': Response error: ' +
+            console.log(new Date().toLocaleString() + ': Response error: ' +
               renponse.status + ' from ' + vendor.vendorName + ' for item ' + item.name);
             continue;
           }
@@ -120,114 +119,27 @@ function main() {
 
           console.log(
             priceElement
-              ? time.toLocaleString() + ': \'' + modelNumber + '\': ' + priceElement +
+              ? new Date().toLocaleString() + ': \'' + modelNumber + '\': ' + priceElement +
               ' from ' + vendor.vendorName
-              : time.toLocaleString() + ': \'' + modelNumber + '\'' +
+              : new Date().toLocaleString() + ': \'' + modelNumber + '\'' +
               ' price is currently not available from ' + vendor.vendorName);
 
           // Evaluate deal and send email notification if the item is on deal.
-          let isDeal = evalPrice(priceElement, item.meanPrice);
+          let isDeal = priceUtils.evalPrice(priceElement, item.meanPrice);
           if (isDeal && item.subscribers.length !== 0) {
             //await email.sendEmail(vendor.url, item).catch(console.error);
             console.log('Sending email to subscribers.');
           }
 
-          let newMeanPrice = getMeanPrice(item, priceElement);
-          isDebug && newMeanPrice ? printPrice(newMeanPrice, item.meanPrice, item.meanCount, newMeanPrice) : null;
+          let newMeanPrice = priceUtils.getMeanPrice(item, priceElement);
+          isDebug && newMeanPrice ? priceUtils.printPrice(newMeanPrice, item.meanPrice, item.meanCount, newMeanPrice) : null;
           // If new meanprice exist update the price, otherwise change availiability to out-of-stock
-          newMeanPrice ? updatePrice(item, vendor, newMeanPrice, newMeanPrice) : updateAvailability(item);
-
+          newMeanPrice ? Item.updatePrice(item, vendor, newMeanPrice, newMeanPrice) : Item.updateAvailability(item);
           // TODO: might be better to handle db's availability field is null
         }
       }
     })
     .catch(err => {
       throw err;
-    });
-}
-
-function evalPrice(newPrice, previousPrice) {
-  // TODO: Could use a better algorithm here to justify a good deal
-  if (!newPrice || !previousPrice || (parseFloat(newPrice) > parseFloat(previousPrice))) {
-    return false;
-  }
-  return true;
-}
-
-function getMeanPrice(item, newPrice) {
-  if (!newPrice) {
-    console.log(time.toLocaleString() + ': \'' + item.modelNumber + '\'' +
-      ' price is cannot be updated.');
-    return;
-  }
-  newPrice = parseFloat(newPrice).toFixed(2);
-  let meanCount = parseInt(item.meanCount);
-  let meanPrice = parseFloat(item.meanPrice ? item.meanPrice : 0).toFixed(2);
-  return (parseFloat(parseFloat(newPrice) + parseFloat(meanPrice * meanCount)) / parseFloat(meanCount + 1)).toFixed(2);
-}
-
-function updatePrice(item, vendor, newPrice, newMeanPrice) {
-  Item.updateOne(
-    { 'modelNumber': item.modelNumber, 'vendors.name': vendor.name },
-    {
-      $set: {
-        'meanPrice': parseFloat(newMeanPrice),
-        'meanCount': parseInt(item.meanCount) + 1,
-        'vendors.$.currentPrice': newPrice
-      }
-    })
-    .then(val => {
-      console.log(time.toLocaleString() + ': ' + item.modelNumber + ' mean price is updated to $' + newMeanPrice + '\n');
-    })
-    // console.log(val)})
-    .catch(err => {
-      console.log(time.toLocaleString() + ': ' + err + ' error updating item price.');
-    });
-
-  return;
-}
-
-function printPrice(newPrice, meanPrice, meanCount, newMeanPrice) {
-  console.log('newPrice: ' + newPrice);
-  console.log('meanPrice: ' + parseFloat(meanPrice).toFixed(2));
-  console.log('meanCount: ' + parseInt(item.meanCount).toFixed(2));
-  console.log('meanPrice * meanCount: ' + parseFloat(meanPrice * meanCount).toFixed(2));
-  console.log('newMeanPrice: ' + newMeanPrice);
-  return;
-}
-
-function resetDbPrice() {
-  Item.updateMany({},
-    {
-      $set: {
-        'meanPrice': 0,
-        'meanCount': 0,
-        'vendors.$.currentPrice': 0
-      }
-    })
-    .then(val => {
-      console.log(time.toLocaleString() + ': ' + item.modelNumber + ' mean price is updated to $' + newMeanPrice)
-    })
-    // console.log(val)})
-    .catch(err => {
-      console.log(time.toLocaleString() + ': ' + err + ' error updating item price.');
-    });
-  return;
-}
-
-function updateAvailability(item) {
-  Item.updateOne(
-    { 'modelNumber': item.modelNumber },
-    {
-      $set: {
-        'availability': false,
-      }
-    })
-    .then(val => {
-      console.log(time.toLocaleString() + ': ' + item.modelNumber + ' Availability updated to false')
-    })
-    // console.log(val)})
-    .catch(err => {
-      console.log(time.toLocaleString() + ': ' + err + ' error updating item availiability.');
     });
 }
