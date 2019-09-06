@@ -16,12 +16,8 @@
 </head>
 
 <body class="d-flex flex-column h-100">
-  <!-- NAVIGATION -->
-  <% include partials/navbar %>
-  <!-- MAIN -->
-  <% include partials/main %>
-  <!-- FOOTER -->
-  <% include partials/footer %>
+  <!-- BODY -->
+  <%- body %>
 
   <!-- AXIOS ON CLINET SIDE; Note: Unlike to server-side code, browser does not know about NPM, so axios cannot be imported -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>

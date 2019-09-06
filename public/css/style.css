@@ -21,8 +21,11 @@ body {
 }
 
 .footer {
-  background-color: #212529
-  ;
+  background-color: #212529;
+}
+
+#loginButton {
+  background-color: transparent;
 }
 
 @media (min-width: 768px) {
