@@ -1,5 +1,9 @@
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
+const flash = require('connect-flash');
+const session = require('express-session');
+const passport = require('passport');
+require('./config/passport')(passport);
 const app = express();
 const path = require('path');
 const axios = require('axios');
@@ -32,6 +36,34 @@ mongoose
 // EJS
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
+
+//Express Session
+app.use(session({
+  secret: 'secret',
+  resave: true,
+  saveUninitialized: true
+}));
+
+//Passport Middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+//Connect flash
+app.use(flash());
+
+//Global Variables
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  res.locals.error = req.flash('error');
+  next();
+});
+
+//No Cache - solve back button problem
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  next();
+});
 
 // Router
 app.use('/', require('./routes/index'));
