@@ -25,13 +25,13 @@ $(document).ready(function () {
 
 subscribeRequest = async (itemClicked, email) => {
     // Make POST request to add a subscriber for currently clicked item
-    const res = await axios.post('http://localhost:5000/subscribe', {
+    const res = await axios.post('http://localhost:5000/items/subscribe', {
         itemName: itemClicked,
         email: email
     });
 
     // Alert message based on the status of subscribe
-    if(res.data.isSubscribed) {
+    if (res.data.isSubscribed) {
         alert(`Your email is already subscribed to ${itemClicked}.`);
     } else {
         alert(`Successfully subscribed to ${itemClicked}.`);

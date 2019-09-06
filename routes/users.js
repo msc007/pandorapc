@@ -11,10 +11,8 @@ router.get('/logout', (req, res) => {
     res.send('logging out');
 });
 
-// auth with google
-router.get('/login', (req, res) => {
-    // handle with passport
-    res.send('logging in with google');
-});
+router.get('/signup', (req, res) => {
+    res.render('signup');
+})
 
 module.exports = router;

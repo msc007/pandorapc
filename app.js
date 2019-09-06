@@ -1,6 +1,5 @@
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
-const authRoutes = require('./routes/auth');
 const app = express();
 const path = require('path');
 const axios = require('axios');
@@ -13,9 +12,11 @@ const email = require('./email');
 const priceUtils = require('./priceUtils');
 const env = process.env.NODE_ENV || 'dev';
 
+// Set static public directory
 if (env === 'dev') {
-  // Set static public directory (for css/jquery/etc...)
+  console.log("DEV Environment");
   app.use(express.static(path.join(__dirname + '/public')));
+  app.use('/users', express.static(path.join(__dirname + '/public')));
 }
 
 // Middlewares
@@ -34,35 +35,8 @@ app.set('view engine', 'ejs');
 
 // Router
 app.use('/', require('./routes/index'));
-app.use('/auth', require('./routes/auth'));
-
-
-// POST request to subscribe
-app.post('/subscribe', (req, res) => {
-  Item.findOne({ name: req.body.itemName, subscribers: req.body.email })
-    .then(item => {
-      let isSubscribed = false;
-      if (item) {
-        isSubscribed = true;
-      } else {
-        // Push new subscriber to subscribers array
-        Item.updateOne(
-          { name: req.body.itemName },
-          { $addToSet: { "subscribers": req.body.email } }) // Note: $push not used inorder to avoid duplicate email
-          .then(item => {
-            console.log("Subscriber SUCCESSFULLY added!");
-          })
-          .catch(err => {
-            console.log("ERROR OCCURED DURING FINDANDUPDATE");
-          });
-      }
-
-      res.send({ isSubscribed: isSubscribed })
-    })
-    .catch(err => {
-      console.log("Error occured during subscribe");
-    });
-});
+app.use('/users', require('./routes/users'));
+app.use('/items', require('./routes/items'));
 
 // Start the server
 const PORT = process.env.PORT || 5000;
@@ -136,7 +110,6 @@ function main() {
           isDebug && newMeanPrice ? priceUtils.printPrice(newMeanPrice, item.meanPrice, item.meanCount, newMeanPrice) : null;
           // If new meanprice exist update the price, otherwise change availiability to out-of-stock
           newMeanPrice ? Item.updatePrice(item, vendor, newMeanPrice, newMeanPrice) : Item.updateAvailability(item);
-          // TODO: might be better to handle db's availability field is null
         }
       }
     })
