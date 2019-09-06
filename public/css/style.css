@@ -15,8 +15,14 @@ main > .container {
   padding: 60px 15px 0;
 }
 
-.footer {
+body {
   background-color: #f5f5f5;
+
+}
+
+.footer {
+  background-color: #212529
+  ;
 }
 
 @media (min-width: 768px) {
