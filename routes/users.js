@@ -37,15 +37,16 @@ router.post('/signup', (req, res) => {
     let errors = [];
 
     //Check required field
-    if (!name || !email || !password || !password2)
+    if (!name || !email || !password || !password2) {
         errors.push({ msg: 'Please fill in all fields' });
+    } else {
+        //Check password match
+        if (password !== password2)
+            errors.push({ msg: 'Passwords do not match' });
 
-    //Check password match
-    if (password !== password2)
-        errors.push({ msg: 'Passwords do not match' });
-
-    if (password.length < 6)
-        errors.push({ msg: 'Password should be at least 6 characters' });
+        if (password.length < 6)
+            errors.push({ msg: 'Password should be at least 6 characters' });
+    }
 
     if (errors.length > 0) {
         res.render('signup', {
