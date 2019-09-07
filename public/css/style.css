@@ -6,13 +6,14 @@
   -ms-user-select: none;
   user-select: none;
 }
+
 html {
   height: 100%;
   width: 100%;
 }
 
-main > .container {
-  padding: 60px 15px 0;
+main {
+  padding:60px 15px 0;
 }
 
 body {
@@ -24,12 +25,25 @@ body {
   background-color: #212529;
 }
 
-#loginButton {
-  background-color: transparent;
+
+/* FLOATING BUTTON */
+.float{
+	position:fixed;
+	width:60px;
+	height:60px;
+	bottom:80px;
+	right:30px;
+	background-color:#0C9;
+	color:#FFF;
+	border-radius:50px;
+	text-align:center;
+	box-shadow: 2px 2px 3px #999;
 }
-#logoutButton {
-  background-color: transparent;
+.my-float{
+	margin-top:22px;
 }
+
+/* MEDIA QUERY */
 @media (min-width: 768px) {
   .bd-placeholder-img-lg {
     font-size: 3.5rem;

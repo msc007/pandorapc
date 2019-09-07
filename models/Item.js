@@ -33,11 +33,13 @@ ItemSchema.statics.updatePrice = function (item, vendor, newPrice, newMeanPrice)
       $set: {
         'meanPrice': newMeanPrice,
         'meanCount': parseInt(item.meanCount) + 1,
-        'vendors.$.currentPrice': newPrice
+        'vendors.$.currentPrice': newPrice,
+        'availability': true
       }
     })
     .then(val => {
-      console.log(new Date().toLocaleString() + ': ' + item.modelNumber + ' mean price is updated to $' + newMeanPrice + '\n');
+      console.log(new Date().toLocaleString() + ': ' + item.modelNumber + ' mean price is updated to $' + newMeanPrice +
+        ', and set availability to true\n');
     })
     // console.log(val)})
     .catch(err => {
