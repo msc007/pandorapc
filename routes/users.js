@@ -103,6 +103,7 @@ router.post('/signup', (req, res) => {
 
 /* GET DASHBOARD ROUTE  */
 router.get('/dashboard', ensureAuthenticated, (req, res) => {
+  // Find all the items cureent user subscribed.
   Item.find({ subscribers: req.user.email })
     .then(items => {
       res.render('dashboard', {
@@ -115,7 +116,5 @@ router.get('/dashboard', ensureAuthenticated, (req, res) => {
       throw err;
     })
 });
-
-
 
 module.exports = router;
