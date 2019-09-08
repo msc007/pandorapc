@@ -20,7 +20,11 @@ $(document).ready(function () {
             // Close modal if subscribed successfully
             $(modalID).modal('hide');
         } else {
-            alert("Invalid email. Please try again!");
+            Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: 'Invalid email. Please try again!'
+            });
         }
         // Reset button and input
         $(this).prop('disabled', false);
@@ -37,8 +41,15 @@ subscribeRequest = async (itemClicked, email) => {
 
     // Alert message based on the status of subscribe
     if (res.data.isSubscribed) {
-        alert(`Your email is already subscribed to ${itemClicked}.`);
+        Swal.fire({
+            type: 'error',
+            title: 'Oops...',
+            text: `Your email is already subscribed to ${itemClicked}.`
+        });
     } else {
-        alert(`Successfully subscribed to ${itemClicked}.`);
+        Swal.fire({
+            type: 'success',
+            title: `Successfully subscribed to ${itemClicked}.`
+        });
     }
 }

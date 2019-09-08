@@ -14,14 +14,33 @@ $(document).ready(function () {
             });
 
             if (res.data.errorMessage) {
-                alert(res.data.errorMessage);
+                // Alert error message
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: res.data.errorMessage
+                });
             } else if (res.data.duplicateMessage) {
-                alert(res.data.duplicateMessage);
+                // Alert duplicate error message
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: res.data.duplicateMessage
+                });
             } else {
+                Swal.fire({
+                    type: 'success',
+                    title: 'Successfully added the URL!'
+                });
                 $('#floatingButtonModal').modal('hide');
             }
         } else {
-            alert("Not a valid URL. Please try again!");
+            // Alert invalid URL error message
+            Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: 'Not a vlid URL. Please try again!'
+            });
         }
         // Reset button and input
         $(this).prop('disabled', false);
@@ -29,5 +48,3 @@ $(document).ready(function () {
 
     });
 });
-
-

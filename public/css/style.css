@@ -18,13 +18,25 @@ main {
 
 body {
   background-color: #f5f5f5;
+  padding-right: 0px !important; /* To fix bootstrap modal padding right issue */
+
+
+}
+
+nav {
+  padding-right: 0px !important; /* To fix bootstrap modal padding right issue */
 
 }
 
 .footer {
   background-color: #212529;
-}
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: auto;
+  width: 100%;
 
+}
 
 /* FLOATING BUTTON */
 .my-float {
