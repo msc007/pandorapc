@@ -82,9 +82,9 @@ scrapeItem = async (url) => {
 
   const rawHTML = response.data;
   const $ = cheerio.load(rawHTML);
-  const isPCPart = $('#prodDetails > div > div:nth-child(1) > div.a-row.a-spacing-base > div > div.a-row > div > h1');
+  const isPCPart = $('#wayfinding-breadcrumbs_feature_div > ul > li:nth-child(5) > span > a').text().trim();
   // Check if URL item is a pc part
-  if (!isPCPart)
+  if (isPCPart !== "Computer Components")
     return "Provided URL item is not a PC part.";
 
   // Scrape necessary data
