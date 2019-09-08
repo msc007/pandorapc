@@ -4,26 +4,25 @@ const Schema = mongoose.Schema;
 // Create schema for a item
 const ItemSchema = new Schema({
   _id: Schema.Types.ObjectId,
-  name: String,
-  description: String,
-  modelNumber: String,
-  itemNumber: String,
+  name: { type: String, required: true },
+  description: { type: String, default: "" },
+  modelNumber: { type: String, default: "" },
   vendors: [
     {
-      vendorName: String,
-      url: String,
-      currentPrice: String,
-      prevPrice: String
+      _id: false,
+      vendorName: { type: String, required: true },
+      url: { type: String, required: true },
+      currentPrice: { type: String, required: true }
     }
   ],
   subscribers: [String],
-  meanPrice: String,
-  meanCount: String,
+  meanPrice: { type: String, required: true },
+  meanCount: { type: String, required: true },
   availability: {
     type: Boolean,
     default: true
   }
-});
+}, { versionKey: false });
 
 /* FUNCTIONS ItemSchema */
 ItemSchema.statics.updatePrice = function (item, vendor, newPrice, newMeanPrice) {

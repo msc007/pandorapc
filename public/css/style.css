@@ -27,7 +27,7 @@ body {
 
 
 /* FLOATING BUTTON */
-.float{
+.my-float {
 	position:fixed;
 	width:60px;
 	height:60px;
@@ -39,7 +39,7 @@ body {
 	text-align:center;
 	box-shadow: 2px 2px 3px #999;
 }
-.my-float{
+.my-float-img {
 	margin-top:22px;
 }
 

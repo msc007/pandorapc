@@ -2,6 +2,8 @@
 $(document).ready(function () {
     // [id=subscribeButton] attribute value selector for handle multiple modal buttons
     $('[id=subscribeButton]').on('click', function (e) {
+        // prevent multiple submit
+        $(this).prop('disabled', true);
         // prevent page from refresh
         e.preventDefault();
         // Get clicked item name
@@ -14,12 +16,15 @@ $(document).ready(function () {
         // Validate email format
         if (validator.isEmail(email) && !validator.isEmpty(email)) {
             // AXIOS POST request to subscribe to a product
-            const isSubscribed = subscribeRequest(itemClicked, email);
+            subscribeRequest(itemClicked, email);
             // Close modal if subscribed successfully
             $(modalID).modal('hide');
         } else {
             alert("Invalid email. Please try again!");
         }
+        // Reset button and input
+        $(this).prop('disabled', false);
+        $(this).closest('.modal-content').find('input').val('');
     });
 });
 
