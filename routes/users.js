@@ -109,6 +109,7 @@ router.get('/dashboard', ensureAuthenticated, (req, res) => {
       res.render('dashboard', {
         items: items,
         name: req.user.name,
+        email: req.user.email,
         sessionID: req.sessionID
       });
     })

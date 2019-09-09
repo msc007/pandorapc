@@ -109,8 +109,12 @@ function main() {
             headers: {
               'User-Agent': userAgent
             }
-          });
+          }).catch(err => console.log(err));
 
+          if (!response) {
+            console.log("Error getting response");
+            continue;
+          }
           if (response.status !== 200) {
             console.log(new Date().toLocaleString() + ': Response error: ' +
               renponse.status + ' from ' + vendor.vendorName + ' for item ' + item.name);

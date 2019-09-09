@@ -16,7 +16,7 @@ $(document).ready(function () {
         // Validate email format
         if (validator.isEmail(email) && !validator.isEmpty(email)) {
             // AXIOS POST request to subscribe to a product
-            subscribeRequest(itemClicked, email);
+            subscribeRequest(itemClicked, email).catch(err => { console.log(err) });
             // Close modal if subscribed successfully
             $(modalID).modal('hide');
         } else {
@@ -37,7 +37,7 @@ subscribeRequest = async (itemClicked, email) => {
     const res = await axios.post('http://localhost:5000/items/subscribe', {
         itemName: itemClicked,
         email: email
-    });
+    }).catch(err => console.log(err));
 
     // Alert message based on the status of subscribe
     if (res.data.isSubscribed) {

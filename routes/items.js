@@ -20,17 +20,39 @@ router.post('/subscribe', (req, res) => {
           { name: req.body.itemName },
           { $addToSet: { "subscribers": req.body.email } }) // Note: $push not used inorder to avoid duplicate email
           .then(item => {
-            console.log("Subscriber SUCCESSFULLY added!");
+            console.log('Subscribed successfully.');
           })
           .catch(err => {
-            console.log("ERROR OCCURED DURING FINDANDUPDATE");
+            console.log('Error occured during subscribe update');
           });
       }
 
       res.send({ isSubscribed: isSubscribed })
     })
     .catch(err => {
-      console.log("Error occured during subscribe");
+      console.log('Error occured during subscribe find');
+    });
+});
+
+// POST request to unsubscribe
+router.post('/unsubscribe', (req, res) => {
+  Item.findOne({ name: req.body.itemName })
+    .then(item => {
+      let isUnsubscribed = true;
+      // Push new subscriber to subscribers array
+      item.updateOne(
+        { $pull: { "subscribers": req.body.email } })
+        .then(item => {
+          isUnsubscribed = false;
+          res.send({ isUnsubscribed: isUnsubscribed })
+          console.log(`${req.body.email} successfully unsubscribed from ${req.body.itemName}`);
+        })
+        .catch(err => {
+          console.log('Error occured during unsubscribe update');
+        });
+    })
+    .catch(err => {
+      console.log('Error occured during unsubscribe find');
     });
 });
 
@@ -40,19 +62,18 @@ router.post('/addURL', ensureAuthenticated, (req, res) => {
   // TODO: perform initial scraping and insert to db
   Item.findOne({ 'vendors.url': { $in: req.body.url } }, async function (err, item) {
     if (err) {
-      console.log('Error occured during adding item');
+      console.log(`Error occured during adding URL: ${req.body.url}`);
     }
     if (!item) {
       //console.log('URL not exist, need to be scraped');
-      const errorMessage = await scrapeItem(req.body.url);
+      const errorMessage = await scrapeItem(req.body.url).catch(err => { console.log(err) });
       //console.log(errorMessage);
       res.send({ errorMessage: errorMessage });
 
     } else {
       res.send({ duplicateMessage: "Duplicate item! We already have this item on our list." });
     }
-  });
-
+  }).catch(err => { console.log(err) });
 });
 
 scrapeItem = async (url) => {
@@ -72,7 +93,7 @@ scrapeItem = async (url) => {
     headers: {
       'User-Agent': userAgent
     }
-  });
+  }).catch(err => console.log(err));
 
   // Check status of scraping
   if (response.status !== 200) {
@@ -91,7 +112,8 @@ scrapeItem = async (url) => {
   let priceText = $('#priceblock_ourprice').text();
   const priceElement = priceText ? priceText.slice(1, priceText.length) : 0;
   const productTitle = $('#productTitle').text().trim();
-  const modelNumber = $('#productDetails_techSpec_section_2 > tbody > tr:nth-child(3) > td').text().trim();
+  //const modelNumber = $('#productDetails_techSpec_section_2 > tbody > tr:nth-child(3) > td').text().trim();
+  const modelNumber = $('th').filter(function () { return $(this).text().trim() === 'Item model number' }).next().text().trim();
   const availability = priceElement ? true : false;
   const meanCount = priceElement ? "1" : "0";
 
