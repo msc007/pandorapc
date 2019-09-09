@@ -126,7 +126,7 @@ function main() {
           let priceText = $('#priceblock_ourprice').text();
           const priceElement = priceText ? priceText.slice(1, priceText.length) : 0;
           const productTitle = $('#productTitle').text().trim();
-          const modelNumber = $('#productDetails_techSpec_section_2 > tbody > tr:nth-child(3) > td').text().trim();
+          const modelNumber = item.modelNumber;
 
           console.log(
             priceElement
