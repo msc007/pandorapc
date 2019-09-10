@@ -30,7 +30,7 @@ nav {
 
 .footer {
   background-color: #212529;
-  position: absolute;
+  position: relative;
   left: 0;
   bottom: 0;
   height: auto;
