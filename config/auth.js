@@ -9,7 +9,7 @@ module.exports = {
     ensureNotAuthenticated: (req, res, next) => {
         if (req.isAuthenticated()) {
             //req.flash('error_msg', 'Bad Request');
-            res.redirect('/index');
+            res.redirect('/');
             return;
         }
         next();
