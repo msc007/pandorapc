@@ -12,6 +12,7 @@ router.get('/', (req, res) => {
                 res.render('main', {
                     items: items,
                     name: req.user.name,
+                    email: req.user.email,
                     sessionID: req.sessionID
                 });
             } else {
