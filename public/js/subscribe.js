@@ -23,7 +23,8 @@ $(document).ready(function () {
             Swal.fire({
                 type: 'error',
                 title: 'Oops...',
-                text: 'Invalid email. Please try again!'
+                text: 'Invalid email. Please try again!',
+                heightAuto: false
             });
         }
         // Reset button and input
@@ -62,12 +63,14 @@ subscribeRequest = async (itemClicked, email) => {
         Swal.fire({
             type: 'error',
             title: 'Oops...',
-            text: `Your email is already subscribed to ${itemClicked}.`
+            text: `Your email is already subscribed to ${itemClicked}.`,
+            heightAuto: false
         });
     } else {
         Swal.fire({
             type: 'success',
-            title: `Successfully subscribed to ${itemClicked}.`
+            title: `Successfully subscribed to ${itemClicked}.`,
+            heightAuto: false
         });
     }
 }

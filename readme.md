@@ -1,6 +1,9 @@
 # Important Note #
 - ### NodeJS version that supports async or higher is required ###
 
+# Install dependencies #
+- ## To install dependencies from package-lock.json instead of package.json (ci: continuos integration)
+   - npm ci
 
 # Dev Environment #
 
@@ -38,3 +41,7 @@
 - ## Nginx server ##
    - Config file location: /etc/nginx/sites-available/default
    - To apply config changes: sudo service nginx restart
+
+# Git Commands #
+- ## To revert back to previous commit without saving new changes ##
+   - git reset --head HARD

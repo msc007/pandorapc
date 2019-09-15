@@ -32,15 +32,20 @@ unsubscribeRequest = async (itemClicked, email) => {
     if (res.data.isUnsubscribed === false) {
         Swal.fire({
             type: 'success',
-            title: `Successfully unsubscribed!`
+            title: `Successfully unsubscribed!`,
+            heightAuto: false
+            }
+        ).then(() => {
+            // refresh page after successful unsubscribe
+            location.reload();
         });
-        // refresh page after successful unsubscribe
-        location.reload();
+
     } else {
         Swal.fire({
             type: 'error',
             title: 'Oops...',
-            text: `Unexpected error occured during unsubscribe: ${itemClicked}.`
+            text: `Unexpected error occured during unsubscribe: ${itemClicked}.`,
+            heightAuto: false
         });
     }
 }

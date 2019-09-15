@@ -20,7 +20,7 @@ router.post('/subscribe', (req, res) => {
           { name: req.body.itemName },
           { $addToSet: { "subscribers": req.body.email } }) // Note: $push not used inorder to avoid duplicate email
           .then(item => {
-            console.log('Subscribed successfully.');
+            console.log(`${req.body.email} successfully subscribed to ${req.body.itemName}`);
           })
           .catch(err => {
             console.log('Error occured during subscribe update');

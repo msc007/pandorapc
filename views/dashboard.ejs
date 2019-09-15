@@ -3,8 +3,8 @@
 
 <!-- BODY -->
 <main role="main" class="container-fluid flex-fill">
-  <div class="container">
-    <table class="table">
+  <div class="container-fluid">
+    <table class="table table-striped table-dark table-hover table-hover-cursor">
       <thead class="thead-dark">
         <tr>
           <th scope="col">Product Name</th>
@@ -18,14 +18,14 @@
         <!--NOTE: index i,j is required to create unique modals for each item list-->
         <% items.forEach( (item, i) => { item.vendors.forEach( (vendor, j) => { %>
         <tr>
-          <td>
+          <td class="text-truncate">
             <a href="<%= vendor.url %>" target="_blank"><%= item.name %> </a>
           </td>
           <td><%= vendor.vendorName %></td>
-          <td><%= vendor.currentPrice %></td>
+          <td>$ <%= vendor.currentPrice %></td>
           <td><%= item.availability ? "In stock" : "Out of stock" %></td>
           <td>
-            <button type="button" class="btn btn-dark" data-toggle="modal"
+            <button type="button" class="btn btn-secondary" data-toggle="modal"
               data-target="#unsubscribeModal-<%=i%>-<%=j%>">
               Unsubscribe
             </button>

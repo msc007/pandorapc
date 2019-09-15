@@ -18,19 +18,22 @@ $(document).ready(function () {
                 Swal.fire({
                     type: 'error',
                     title: 'Oops...',
-                    text: res.data.errorMessage
+                    text: res.data.errorMessage,
+                    heightAuto: false
                 });
             } else if (res.data.duplicateMessage) {
                 // Alert duplicate error message
                 Swal.fire({
                     type: 'error',
                     title: 'Oops...',
-                    text: res.data.duplicateMessage
+                    text: res.data.duplicateMessage,
+                    heightAuto: false
                 });
             } else {
                 Swal.fire({
                     type: 'success',
-                    title: 'Successfully added the URL!'
+                    title: 'Successfully added the URL!',
+                    heightAuto: false
                 });
                 $('#floatingButtonModal').modal('hide');
             }
@@ -39,7 +42,8 @@ $(document).ready(function () {
             Swal.fire({
                 type: 'error',
                 title: 'Oops...',
-                text: 'Not a vlid URL. Please try again!'
+                text: 'Not a vlid URL. Please try again!',
+                heightAuto: false
             });
         }
         // Reset button and input
