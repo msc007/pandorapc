@@ -7,10 +7,12 @@ $(document).ready(function () {
         e.preventDefault();
 
         const url = $("#urlTextField").val();
+        const email = $(this).data('email');
 
         if (validator.isURL(url)) {
             const res = await axios.post('http://localhost:5000/items/addURL', {
-                url: url
+                url: url,
+                email: email
             });
 
             if (res.data.errorMessage) {
@@ -34,8 +36,10 @@ $(document).ready(function () {
                     type: 'success',
                     title: 'Successfully added the URL!',
                     heightAuto: false
+                }).then(() => {
+                    $('#floatingButtonModal').modal('hide');
+                    location.reload();
                 });
-                $('#floatingButtonModal').modal('hide');
             }
         } else {
             // Alert invalid URL error message

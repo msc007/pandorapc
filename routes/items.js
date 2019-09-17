@@ -66,7 +66,7 @@ router.post('/addURL', ensureAuthenticated, (req, res) => {
     }
     if (!item) {
       //console.log('URL not exist, need to be scraped');
-      const errorMessage = await scrapeItem(req.body.url).catch(err => { console.log(err) });
+      const errorMessage = await scrapeItem(req.body.url, req.body.email).catch(err => { console.log(err) });
       //console.log(errorMessage);
       res.send({ errorMessage: errorMessage });
 
@@ -76,7 +76,7 @@ router.post('/addURL', ensureAuthenticated, (req, res) => {
   }).catch(err => { console.log(err) });
 });
 
-scrapeItem = async (url) => {
+scrapeItem = async (url, email) => {
   // Get capitalized vendor name
   let vendor = url.split('.')[1];
   vendor = vendor.charAt(0).toUpperCase() + vendor.slice(1);
@@ -129,6 +129,7 @@ scrapeItem = async (url) => {
         currentPrice: priceElement
       }
     ],
+    subscribers: [email],
     imageURL: imageURL,
     meanPrice: priceElement,
     meanCount: meanCount,
