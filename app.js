@@ -77,7 +77,7 @@ app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 let isDebug = true;
 
 if (env === 'dev') {
-  //main();
+  main();
 } else {
   /* NOTE ABOUT CRON:
   * Second(0-59)
