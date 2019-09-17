@@ -7,6 +7,7 @@
     <table class="table table-striped table-dark table-hover table-hover-cursor">
       <thead class="thead-dark">
         <tr>
+          <th scope="col"></th>
           <th scope="col">Product Name</th>
           <th scope="col">Vendor</th>
           <th scope="col">Current Price</th>
@@ -18,6 +19,11 @@
         <!--NOTE: index i,j is required to create unique modals for each item list-->
         <% items.forEach( (item, i) => { item.vendors.forEach( (vendor, j) => { %>
         <tr>
+          <td>
+            <a href="<%= vendor.url %>" target="_blank">
+                <img src="<%= item.imageURL %>">
+            </a>
+          </td>
           <td class="text-truncate">
             <a href="<%= vendor.url %>" target="_blank"><%= item.name %> </a>
           </td>

@@ -103,16 +103,17 @@ scrapeItem = async (url) => {
 
   const rawHTML = response.data;
   const $ = cheerio.load(rawHTML);
-  const isPCPart = $('#wayfinding-breadcrumbs_feature_div > ul > li:nth-child(5) > span > a').text().trim();
+  const isPCPart = $('#prodDetails > div > div:nth-child(1) > div.a-row.a-spacing-base > div > div.a-row > div > h1').text().trim();
+
   // Check if URL item is a pc part
-  if (isPCPart !== "Computer Components")
-    return "Provided URL item is not a PC part.";
+  if (isPCPart !== "Technical Details")
+    return "Provided URL is not a PC part.";
 
   // Scrape necessary data
   let priceText = $('#priceblock_ourprice').text();
   const priceElement = priceText ? priceText.slice(1, priceText.length) : 0;
   const productTitle = $('#productTitle').text().trim();
-  //const modelNumber = $('#productDetails_techSpec_section_2 > tbody > tr:nth-child(3) > td').text().trim();
+  const imageURL = $('#altImages > ul > li:nth-child(1)').find('img').attr('src').trim(); // NOTE: img url selector is different from Linux and windows environment
   const modelNumber = $('th').filter(function () { return $(this).text().trim() === 'Item model number' }).next().text().trim();
   const availability = priceElement ? true : false;
   const meanCount = priceElement ? "1" : "0";
@@ -128,6 +129,7 @@ scrapeItem = async (url) => {
         currentPrice: priceElement
       }
     ],
+    imageURL: imageURL,
     meanPrice: priceElement,
     meanCount: meanCount,
     availability: availability
