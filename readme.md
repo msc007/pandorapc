@@ -44,4 +44,4 @@
 
 # Git Commands #
 - ## To revert back to previous commit without saving new changes ##
-   - git reset --head HARD
+   - git reset --hard HEAD

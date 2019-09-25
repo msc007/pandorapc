@@ -1,8 +1,10 @@
 function evalPrice(newPrice, previousPrice) {
   // TODO: Could use a better algorithm here to justify a good deal
-  if (!newPrice || !previousPrice || (parseFloat(newPrice) >= parseFloat(previousPrice))) {
+  // Currently if the new price is <= 15% of previoud mean price, it will considered as a deal.
+  if (!newPrice || !previousPrice || (parseFloat(newPrice) > parseFloat(previousPrice) - parseFloat((parseFloat(previousPrice) * 0.15).toFixed(2)))) {
     return false;
   }
+  console.log('This product is under deal.');
   return true;
 }
 
